@@ -1,73 +1,87 @@
 ﻿import { Grid } from "./Grid";
 import { GameConfiguration } from "./GameConfiguration"; 
+import { PipeQueue } from "./PipeQueue";
+import { Cell } from "./Cell";
+import { Pipe } from "./Pipe";
 
 
-// list of pipes, grid, win, lose
 export class Game {
+
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  queueContainer: HTMLElement;
-  gameStatus: HTMLElement;
-  grid: Grid = new Grid(0, 0, 0); // Inicialização
-  selectedCell: { row: number; col: number } = { row: 0, col: 0 };
+  queueContainer: HTMLElement; // neste momento limpa o conteudo anterior da fila
+  gameStatus: HTMLElement;  // neste momento nao esta a ser usado
+  grid: Grid; // Inicialização do grid
+  pipeQueue: PipeQueue = new PipeQueue(5);
 
   constructor(
     canvas: HTMLCanvasElement,
     queueContainer: HTMLElement,
-    gameStatus: HTMLElement
-  ) {
+    gameStatus: HTMLElement,
+    grid: Grid
+) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
-    this.queueContainer = queueContainer;
+    this.queueContainer = queueContainer; 
     this.gameStatus = gameStatus;
-
-
-    // Adjust canvas size
-    this.canvas.width = GameConfiguration.cols * GameConfiguration.cellSize;
-    this.canvas.height = GameConfiguration.rows * GameConfiguration.cellSize;
+    this.grid = grid;
 
     // Events
     this.addEventListeners();
+    this.startGame();
   }
 
+  // inicia do jogo
   startGame() {
-    this.grid = new Grid(GameConfiguration.rows, GameConfiguration.cols, GameConfiguration.cellSize);
-    this.updateQueue();
-    this.drawGame();
+    this.drawGame(); // chama a função para desenhar o jogo
     this.gameStatus.textContent = "Game started. Build your path!";
   }
 
   drawGame() {
-    console.log("Desenhando o jogo...");
-    this.grid.draw(this.ctx);
-
-    // Draw selected cell
-    this.ctx.strokeStyle = "red";
-    this.ctx.lineWidth = 3;
-
-    this.ctx.strokeRect(
-      GameConfiguration.selectedCell.col * GameConfiguration.cellSize,
-      GameConfiguration.selectedCell.row * GameConfiguration.cellSize,
-      GameConfiguration.cellSize,
-      GameConfiguration.cellSize
-    );
+    this.grid.draw(this.ctx); // desenha o grid
+    this.pipeQueue.drawPipeQueue(this.ctx, 0, 10); // desenha a fila de pipes
   }
 
   updateQueue() {
-    this.queueContainer.innerHTML = "Pipe queue..."; // Implement queue logic in the future
+    // Limpa o conteúdo anterior da fila
+    this.queueContainer.innerHTML = ""; 
   }
 
-  addEventListeners() {
-    // Mouse click on the canvas
-    this.canvas.addEventListener("click", (event) => {
-      const rect = this.canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
 
-      this.selectedCell.col = Math.floor(x / GameConfiguration.cellSize);
-      this.selectedCell.row = Math.floor(y / GameConfiguration.cellSize);
 
-      this.drawGame();
-    });
+  // Função para escolher aleatoriamente uma célula inicial
+  /*chooseStartingCell(cells: Cell[]): Cell | null {
+    const validCells = cells.filter(cell => cell.canBeStartingCell(cells));
+    if (validCells.length === 0) return null;
+    const randomIndex = Math.floor(Math.random() * validCells.length);
+    return validCells[randomIndex];
+  }*/
+
+    addEventListeners() {
+      this.canvas.addEventListener("click", (event) => {
+        const x = event.clientX - this.grid.getStartX(this.ctx);
+        const y = event.clientY - this.grid.getStartY(this.ctx);
+  
+        console.log("clicked on X" + event.clientX);
+        console.log("clicked on Y" + event.clientY);
+
+        console.log("x = " + this.grid.getStartX(this.ctx));
+        console.log("y = " + this.grid.getStartY(this.ctx));
+
+        const col = Math.floor(x / GameConfiguration.cellSize);
+        const row = Math.floor(y / GameConfiguration.cellSize);
+
+        console.log("col = " + col);
+        console.log("row = " + row);
+  
+        // Verifica se a célula está dentro dos limites da grade
+        if (row >= 0 && row < GameConfiguration.rows && col >= 0 && col < GameConfiguration.cols) {
+          const pipe = new Pipe(); // Cria uma nova instância de Pipe
+          const placed = this.grid.placePipe(row, col, pipe);
+          if (placed) {
+            this.drawGame(); // Redesenha o jogo após a colocação do tubo
+          }
+        }
+      });
+    }
   }
-}

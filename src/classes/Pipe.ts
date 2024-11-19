@@ -1,5 +1,4 @@
-﻿
-export type PipeType = "horizontal" | "curvedUp" | "curvedDown" | "cross" | "vertical"
+﻿export type PipeType = "horizontal" | "curvedUp" | "curvedDown" | "cross" | "vertical"
 export type Direction = "top" | "bottom" | "left" | "right"; 
 
 
@@ -12,26 +11,30 @@ const images = {
   cross: new Image(),
 };
 
-images.vertical.src = 'assets/vertical.png';
-images.horizontal.src = 'assets/horizontal.png'
-images.curvedUp.src = 'assets/curvedUp.png';
-images.curvedDown.src = 'assets/curvedDown.png';
-images.tJunction.src = 'assets/t-junction.png';
-images.cross.src = 'assets/cross.png';
+images.vertical.src = 'src/assets/vertical.png';
+images.horizontal.src = 'src/assets/horizontal.png'
+images.curvedUp.src = 'src/assets/curvedUp.png';
+images.curvedDown.src = 'src/assets/curvedDown.png';
+images.cross.src = 'src/assets/cross.png';
 
 
 export class Pipe {
-  private type: PipeType;
-  private rotation: number; // fixed number
+
   private connections: Direction[]; // directions for connecting the piece 
   private image: HTMLImageElement; // Stores the corresponding image for the pipe
+  private rotation: number; // Adicionando a propriedade rotation
 
-
-  constructor(type: PipeType, rotation: number, connections: Direction[]) {
-    this.type = type;
-    this.rotation = this.getDefaultOrientation(type)
+  constructor() {
+    const type = this.getRandomPipeType(); // Escolhendo um tipo aleatório
+    this.rotation = this.getDefaultOrientation(type);
     this.connections = this.getConnectionsByType(type);
     this.image = this.getImageByType(type); // Sets the image based on the type
+  }
+
+  private getRandomPipeType(): PipeType {
+    const types: PipeType[] = ["horizontal", "curvedUp", "curvedDown", "cross", "vertical"];
+    const randomIndex = Math.floor(Math.random() * types.length);
+    return types[randomIndex]; // Retorna um tipo aleatório
   }
 
   private getDefaultOrientation(type: PipeType): number {
@@ -90,8 +93,12 @@ export class Pipe {
   }
 
   draw(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
-    if (this.image) {
-      ctx.drawImage(this.image, x, y, size, size); // Draws the image on the canvas
+    if (this.image.complete) {
+        ctx.drawImage(this.image, x, y, size, size);
+    } else {
+        this.image.onload = () => {
+            ctx.drawImage(this.image, x, y, size, size);
+        };
     }
   }
 }

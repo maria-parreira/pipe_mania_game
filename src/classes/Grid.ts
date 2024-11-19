@@ -18,15 +18,21 @@ export class Grid {
 
   // method creates the grid with cells
   private initializeGrid() {
-    let blockedCount = 0; 
+    const totalCells = this.rows * this.cols;
+    const blockedCount = Math.floor(totalCells * 0.1); // Bloqueia 10% das células
+    const blockedIndices = new Set<number>();
+
+    // Gera índices únicos para células bloqueadas
+    while (blockedIndices.size < blockedCount) {
+      const randomIndex = Math.floor(Math.random() * totalCells);
+      blockedIndices.add(randomIndex);
+    }
 
     for (let row = 0; row < this.rows; row++) {
       const gridRow: { pipe: Pipe | null; blocked: boolean; water: boolean }[] = [];
       for (let col = 0; col < this.cols; col++) {
-        const isBlocked = blockedCount === 8 && Math.random() < 0.1; // block only 8 cells
-        if (isBlocked) {
-          blockedCount++;
-        }
+        const index = row * this.cols + col;
+        const isBlocked = blockedIndices.has(index); // Verifica se a célula deve ser bloqueada
         gridRow.push({
           pipe: null,
           blocked: isBlocked,
@@ -38,6 +44,7 @@ export class Grid {
   }
 
 
+
   /*
   renders the grid of cells on the canvas, drawing each cell according to its state (blocked, 
   containing pipe or water) and adding a border around each cell. It ensures that the grid visualization 
@@ -46,13 +53,16 @@ export class Grid {
   */
 
   public draw(ctx: CanvasRenderingContext2D) {
-    ctx.clearRect(0, 0, this.cols * this.cellSize, this.rows * this.cellSize);
+    ctx.clearRect(0, 0, this.cols * this.cellSize, this.rows * this.cellSize ); 
+
+    const borderIntervalX =  this.getBorderIntervalX(ctx)// Calcula a posição X para centralizar
+    const borderIntervalY = this.getBorderIntervalY(ctx); // Calcula a posição Y para centralizar
 
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
         const cell = this.cells[row][col];
-        const x = col * this.cellSize;
-        const y = row * this.cellSize;
+        const x = borderIntervalX + col * this.cellSize; // Usa a posição X centralizada
+        const y = borderIntervalY + row * this.cellSize; // Usa a posição Y centralizada
 
         // Draw blocked cell
         if (cell.blocked) {
@@ -65,18 +75,29 @@ export class Grid {
           cell.pipe.draw(ctx, x, y, this.cellSize);
         }
 
-        // Draw water
-        if (cell.water) {
-          ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
-          ctx.fillRect(x + 10, y + 10, this.cellSize - 20, this.cellSize - 20);
-        }
-
         // Cell border
         ctx.strokeStyle = "black";
         ctx.strokeRect(x, y, this.cellSize, this.cellSize);
       }
     }
   }
+
+  public getBorderIntervalX(ctx:CanvasRenderingContext2D){
+    return (ctx.canvas.width - (this.cols * this.cellSize)) / 2;
+  }
+
+  public getBorderIntervalY(ctx:CanvasRenderingContext2D){
+    return (ctx.canvas.height - (this.rows * this.cellSize)) / 2;
+  }
+
+  public getStartX(ctx:CanvasRenderingContext2D){
+    return ctx.canvas.getBoundingClientRect().x+this.getBorderIntervalX(ctx);
+  }
+
+  public getStartY(ctx:CanvasRenderingContext2D){
+    return ctx.canvas.getBoundingClientRect().y+this.getBorderIntervalY(ctx);
+  }
+
 
   // is responsible for placing a pipe in a specific cell of the grid.
   public placePipe(row: number, col: number, pipe: Pipe): boolean {
@@ -88,5 +109,4 @@ export class Grid {
     return true;
   }
 
-  
 }

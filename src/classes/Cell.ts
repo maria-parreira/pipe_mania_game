@@ -28,4 +28,9 @@ export class Cell {
     isBlocked(): boolean {
         return this.blocked; // Returns if the cell is blocked
     }
+
+    // Método para verificar se a célula pode ser a célula inicial
+    canBeStartingCell(cellsBelow: Cell[]): boolean {
+        return this.row < cellsBelow.length - 1 && !cellsBelow[this.row + 1].isBlocked();
+    }
 }

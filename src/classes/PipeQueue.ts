@@ -4,12 +4,11 @@ import { Direction } from "./Pipe";
 export class PipeQueue {
   private queue: Pipe[]; // stores the available pipes
   private pipeTypes: PipeType[]; 
-  private maxSize: number; // I want it to be unlimited
 
-  constructor(initialSize: number = 5, maxSize: number = Infinity) {
+  constructor(initialSize: number = 5) {
     this.pipeTypes = ["vertical", "curvedDown", "curvedUp", "cross", "horizontal"];
     this.queue = [];
-    this.maxSize = maxSize;
+    // Inicializa a fila com o tamanho inicial
     for (let i = 0; i < initialSize; i++) {
       this.queue.push(this.generatePipe());
     }
@@ -19,17 +18,16 @@ export class PipeQueue {
     const randomType = this.pipeTypes[
       Math.floor(Math.random() * this.pipeTypes.length)
     ];
-    const rotation = 0; // Set an appropriate value for rotation
-    const connections: Direction[] = []; // Set appropriate connections
-    return new Pipe(randomType, rotation, connections);
+    return new Pipe();
   }
 
   public getNextPipe(): Pipe {
-    const nextPipe = this.queue.shift();
-    if (this.queue.length < this.maxSize) {
-      this.queue.push(this.generatePipe());
+    const nextPipe = this.queue.shift(); // Remove o próximo tubo da fila
+    // Garante que a fila tenha sempre 5 tubos
+    if (this.queue.length < 5) {
+      this.queue.push(this.generatePipe()); // Sempre gera um novo tubo
     }
-    return nextPipe!;
+    return nextPipe!; // Retorna o tubo removido
   }
 
   public replacePipe(index: number, newPipe: Pipe) {
@@ -38,7 +36,18 @@ export class PipeQueue {
     }
   }
 
-  public drawQueue(ctx: CanvasRenderingContext2D, x: number, y: number) {
-    // Visually display the queue on the canvas
+  public drawPipeQueue(ctx: CanvasRenderingContext2D, x: number, y: number) {
+    const size = 50; // Defina um tamanho apropriado para os tubos
+    const spacing = 10; // Espaçamento entre os tubos
+
+    // Itera sobre a fila de tubos e desenha cada um
+    this.queue.forEach((pipe, index) => {
+      const pipeY = y + index * (size + spacing); // Calcula a posição Y para cada tubo
+      pipe.draw(ctx, x, pipeY, size); // Desenha o tubo no canvas
+    });
+  }
+
+  public getQueue(): Pipe[] { // Método público para acessar a fila
+    return this.queue; // Retorna a fila de tubos
   }
 }
