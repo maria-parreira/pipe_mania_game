@@ -1,5 +1,12 @@
 ﻿import { Pipe } from './Pipe';
 
+
+/*
+A Grid utiliza uma matriz bidimensional (cells) para armazenar o estado de cada célula.
+Cada célula é representada por um objeto que possui as propriedades pipe, blocked e water. 
+*/
+
+
 export class Grid {
   private rows: number;
   private cols: number;
@@ -18,29 +25,39 @@ export class Grid {
 
   // method creates the grid with cells
   private initializeGrid() {
+    const blockedIndices = this.generateBlockedIndices(); // Bloqueia primeiro 10% das células
+    this.cells = this.createGrid(blockedIndices);
+  }
+
+  private generateBlockedIndices(): Set<number> {
     const totalCells = this.rows * this.cols;
-    const blockedCount = Math.floor(totalCells * 0.1); // Bloqueia 10% das células
+    const blockedCount = Math.floor(totalCells * 0.1); 
     const blockedIndices = new Set<number>();
 
-    // Gera índices únicos para células bloqueadas
     while (blockedIndices.size < blockedCount) {
       const randomIndex = Math.floor(Math.random() * totalCells);
       blockedIndices.add(randomIndex);
     }
+    return blockedIndices;
+  }
 
+  // O método createGrid retorna uma matriz bidimensional que representa o estado da grade (grid). 
+  private createGrid(blockedIndices: Set<number>): { pipe: Pipe | null; blocked: boolean; water: boolean }[][] {
+    const grid: { pipe: Pipe | null; blocked: boolean; water: boolean }[][] = [];
     for (let row = 0; row < this.rows; row++) {
       const gridRow: { pipe: Pipe | null; blocked: boolean; water: boolean }[] = [];
       for (let col = 0; col < this.cols; col++) {
         const index = row * this.cols + col;
-        const isBlocked = blockedIndices.has(index); // Verifica se a célula deve ser bloqueada
+        const isBlocked = blockedIndices.has(index); 
         gridRow.push({
           pipe: null,
           blocked: isBlocked,
           water: false,
         });
       }
-      this.cells.push(gridRow);
+      grid.push(gridRow);
     }
+    return grid;
   }
 
   public getBorderIntervalX(ctx:CanvasRenderingContext2D){
@@ -70,7 +87,19 @@ export class Grid {
     return true;
   }
 
-  public draw(ctx: CanvasRenderingContext2D) {
+
+  // Método para obter uma célula e alterar o pipe que está nessa célula
+  public setCellPipe(row: number, col: number, newPipe: Pipe): boolean {
+    const cell = this.cells[row][col];
+    if (cell.blocked) {
+      return false; // Não pode alterar o pipe se a célula estiver bloqueada
+    }
+    cell.pipe = newPipe; // Altera o pipe na célula
+    return true; // Sucesso na alteração
+  }
+
+
+  public drawGrid(ctx: CanvasRenderingContext2D) {
     ctx.clearRect(0, 0, this.cols * this.cellSize, this.rows * this.cellSize ); 
 
     const borderIntervalX =  this.getBorderIntervalX(ctx)// Calcula a posição X para centralizar

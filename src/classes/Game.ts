@@ -37,7 +37,7 @@ export class Game {
   }
 
   drawGame() {
-    this.grid.draw(this.ctx); // desenha o grid
+    this.grid.drawGrid(this.ctx); // desenha o grid
     this.pipeQueue.drawPipeQueue(this.ctx, 0, 10); // desenha a fila de pipes
   }
 
@@ -56,12 +56,12 @@ export class Game {
         // Verifica se a célula está dentro dos limites da grid
         if (row >= 0 && row < GameConfiguration.rows && col >= 0 && col < GameConfiguration.cols) {
           if (this.selectedPipe) { // Verifica se uma pipe foi selecionada
-            const placed = this.grid.placePipe(row, col, this.selectedPipe); // Coloca a pipe na célula
+            const placed = this.grid.setCellPipe(row, col, this.selectedPipe); // Altera o pipe na célula
             if (placed) {
-              console.log("Pipe colocada na célula:", row, col); // Log para confirmar a colocação
-              this.drawGame(); // Redesenha o jogo após a colocação do tubo
+              console.log("Pipe substituída na célula:", row, col); // Log para confirmar a substituição
+              this.drawGame(); // Redesenha o jogo após a substituição do tubo
             } else {
-              console.log("Falha ao colocar a pipe na célula."); // Log caso a colocação falhe
+              console.log("Falha ao substituir a pipe na célula."); // Log caso a substituição falhe
             }
           } else {
             console.log("Nenhuma pipe selecionada."); // Log caso não haja pipe selecionada
