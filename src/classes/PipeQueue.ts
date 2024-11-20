@@ -1,32 +1,38 @@
 ﻿import { Pipe } from "./Pipe";
 
+/**
+ * PipeQueue class manages a queue of Pipe objects.
+ * It provides methods to add, remove, and retrieve pipes,
+ * as well as to draw the queue on a canvas.
+ */
+
 const Queue = <T>() => {
   const items: T[] = [];
 
   return {
     enqueue(item: T) {
-      items.push(item); // Adiciona um item ao final da fila
+      items.push(item);
     },
     dequeue(): T | undefined {
-      return items.shift(); // Remove o primeiro item da fila
+      return items.shift();
     },
     size(): number {
-      return items.length; // Retorna o tamanho da fila
+      return items.length;
     },
     isEmpty(): boolean {
-      return items.length === 0; // Verifica se a fila está vazia
+      return items.length === 0;
     },
     getItems(): T[] {
-      return items; // Método para acessar os itens da fila
+      return items;
     },
-    peek(): T | undefined { // Método para obter o primeiro item sem removê-lo
-      return items[0]; // Retorna o primeiro item da fila
+    peek(): T | undefined {
+      return items[0];
     }
   };
 };
 
 export class PipeQueue {
-  private queue = Queue<Pipe>(); // Usando o objeto Queue
+  private queue = Queue<Pipe>();
 
   constructor(initialSize: number = 5) {
     for (let i = 0; i < initialSize; i++) {
@@ -34,38 +40,28 @@ export class PipeQueue {
     }
   }
 
+  public drawPipeQueue(ctx: CanvasRenderingContext2D, x: number, y: number) {
+    const pipeSize = 50;
+    const pipeSpacing = 10;
+
+    this.queue.getItems().forEach((pipe, index) => {
+      const pipeY = y + index * (pipeSize + pipeSpacing);
+      pipe.drawPipe(ctx, x, pipeY, pipeSize);
+    });
+  }
   public generatePipe(): Pipe {
-    return new Pipe(); // Aqui você pode usar randomType se necessário
+    return new Pipe();
   }
 
   public getFirstPipe(): Pipe {
-    return this.queue.peek()!; // Adiciona o operador de asserção não nula
+    return this.queue.peek()!;
   }
 
-
-  public drawPipeQueue(ctx: CanvasRenderingContext2D, x: number, y: number) {
-    const pipeSize = 50; // Defina um tamanho apropriado para os tubos
-    const pipeSpacing = 10; // Espaçamento entre os tubos
-
-    // Itera sobre a fila de tubos e desenha cada um
-    this.queue.getItems().forEach((pipe, index) => {
-      const pipeY = y + index * (pipeSize + pipeSpacing); // Calcula a posição Y para cada tubo
-      pipe.drawPipe(ctx, x, pipeY, pipeSize); // Desenha o tubo no canvas
-    });
+  public removeFirst() {
+    this.queue.dequeue();
   }
 
-  public getQueue(): Pipe[] { 
-    return this.queue.getItems(); // Retorna a fila de tubos
+  public addLast(pipe: Pipe) {
+    this.queue.enqueue(pipe);
   }
-
-  removeFirstPipe() {
-    // Lógica para remover a primeira pipe da fila
-    this.queue.dequeue(); // Corrigido para usar o método dequeue
-  }
-
-  addPipe(pipe: Pipe) {
-    this.queue.enqueue(pipe); // Corrigido para usar o método enqueue
-  }
-
-
 }

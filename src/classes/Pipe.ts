@@ -2,23 +2,29 @@
 
 export type PipeType = "horizontal" | "curvedUp" | "curvedDown" | "cross" | "vertical"
 
+/**
+ * Represents a Pipe in the game.
+ * This class handles the pipe's images, random type selection,
+ * and drawing the pipe on the canvas.
+ * Include start pipe and end pipe.
+ */
+
 export class Pipe {
 
-  private image: HTMLImageElement; // Stores the corresponding image for the pipe
-  private startImage: HTMLImageElement; // Stores the initial image for the pipe
+  private image: HTMLImageElement;
+  private startImage: HTMLImageElement;
 
   constructor() {
-    const type = this.getRandomPipeType(); // Escolhendo um tipo aleatório
-    this.image = this.getImageByType(type); // Sets the image based on the type
-    this.startImage = this.getStartImage(); // Sets the initial image for the pipe
+    const type = this.getRandomPipeType();
+    this.image = this.getImageByType(type);
+    this.startImage = this.getStartImage();
   }
 
   private getRandomPipeType(): PipeType {
     const types: PipeType[] = ["horizontal", "curvedUp", "curvedDown", "cross", "vertical"];
     const randomIndex = Math.floor(Math.random() * types.length);
-    return types[randomIndex]; // Retorna um tipo aleatório
+    return types[randomIndex];
   }
-
 
   private getImageByType(type: PipeType): HTMLImageElement {
     switch (type) {
@@ -47,16 +53,14 @@ export class Pipe {
     }
   }
 
-  // desenha a pipe start
   public drawStartPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
-    ctx.drawImage(this.startImage, x, y, size, size); // Uses the stored initial image
+    ctx.drawImage(this.startImage, x, y, size, size);
   }
 
-  // Novo método para obter a imagem do tubo inicial
   private getStartImage(): HTMLImageElement {
     const startTypes = Object.keys(startImages) as Array<keyof typeof startImages>;
     const randomIndex = Math.floor(Math.random() * startTypes.length);
-    return startImages[startTypes[randomIndex]]; // Retorna uma imagem aleatória para o tubo inicial
+    return startImages[startTypes[randomIndex]];
   }
 
 }

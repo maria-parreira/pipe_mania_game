@@ -1,33 +1,31 @@
 ﻿import { Pipe } from './Pipe';
 
 
-/*
-A Grid utiliza uma matriz bidimensional (cells) para armazenar o estado de cada célula.
-Cada célula é representada por um objeto que possui as propriedades pipe, blocked e water. 
-*/
-
+/**
+ * The Grid class represents a two-dimensional grid structure that manages the state of each cell.
+ * Each cell can contain a pipe, be blocked, or have water. The grid is initialized with a specified
+ * number of rows and columns, and a cell size. It provides methods to manipulate and render the grid,
+ * including setting pipes in cells and drawing the grid on a canvas.
+ */
 
 export class Grid {
   private rows: number;
   private cols: number;
   private cellSize: number;
-  private cells: { pipe: Pipe | null; blocked: boolean; water: boolean }[][]; // represents the state of the cell 
+  private cells: { pipe: Pipe | null; blocked: boolean; water: boolean }[][];
   private startPipePosition: { x: number; y: number } | null = null;
-  private startPipe: Pipe | null = null; // Armazena a instância do Pipe
+  private startPipe: Pipe | null = null;
 
-  // public 
   constructor(rows: number, cols: number, cellSize: number) {
     this.rows = rows;
     this.cols = cols;
     this.cellSize = cellSize;
     this.cells = [];
-
     this.initializeGrid();
   }
 
-  // method creates the grid with cells
   private initializeGrid() {
-    const blockedIndices = this.generateBlockedIndices(); // Bloqueia primeiro 10% das células
+    const blockedIndices = this.generateBlockedIndices();
     this.cells = this.createGrid(blockedIndices);
   }
 
@@ -43,7 +41,6 @@ export class Grid {
     return blockedIndices;
   }
 
-  // O método createGrid retorna uma matriz bidimensional que representa o estado da grade (grid). 
   private createGrid(blockedIndices: Set<number>): { pipe: Pipe | null; blocked: boolean; water: boolean }[][] {
     const grid: { pipe: Pipe | null; blocked: boolean; water: boolean }[][] = [];
     for (let row = 0; row < this.rows; row++) {
@@ -62,30 +59,29 @@ export class Grid {
     return grid;
   }
 
-  public getStartX(ctx:CanvasRenderingContext2D){
-    return ctx.canvas.getBoundingClientRect().x+this.getBorderIntervalX(ctx);
+  public getStartX(ctx: CanvasRenderingContext2D) {
+    return ctx.canvas.getBoundingClientRect().x + this.getBorderIntervalX(ctx);
   }
 
-  private getBorderIntervalX(ctx:CanvasRenderingContext2D){
+  private getBorderIntervalX(ctx: CanvasRenderingContext2D) {
     return (ctx.canvas.width - (this.cols * this.cellSize)) / 2;
   }
 
-  public getStartY(ctx:CanvasRenderingContext2D){
-    return ctx.canvas.getBoundingClientRect().y+this.getBorderIntervalY(ctx);
+  public getStartY(ctx: CanvasRenderingContext2D) {
+    return ctx.canvas.getBoundingClientRect().y + this.getBorderIntervalY(ctx);
   }
 
-  private getBorderIntervalY(ctx:CanvasRenderingContext2D){
+  private getBorderIntervalY(ctx: CanvasRenderingContext2D) {
     return (ctx.canvas.height - (this.rows * this.cellSize)) / 2;
   }
 
-  // Método para obter uma célula e alterar o pipe que está nessa célula
   public setCellPipe(row: number, col: number, newPipe: Pipe): boolean {
     const cell = this.cells[row][col];
     if (cell.blocked) {
-      return false; // Não pode alterar o pipe se a célula estiver bloqueada
+      return false;
     }
-    cell.pipe = newPipe; // Altera o pipe na célula
-    return true; // Sucesso na alteração
+    cell.pipe = newPipe;
+    return true;
   }
 
   public drawGrid(ctx: CanvasRenderingContext2D) {
@@ -93,7 +89,7 @@ export class Grid {
 
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
-        this.drawCell(ctx, row, col); // Chama o método para desenhar a célula
+        this.drawCell(ctx, row, col);
       }
     }
   }
@@ -120,16 +116,16 @@ export class Grid {
     return this.getGridCoordinate(row, col, borderIntervalX, borderIntervalY);
   }
 
-  private getBorderIntervals(ctx: CanvasRenderingContext2D){
+  private getBorderIntervals(ctx: CanvasRenderingContext2D) {
     const borderIntervalX = this.getBorderIntervalX(ctx); 
     const borderIntervalY = this.getBorderIntervalY(ctx);
     return { borderIntervalX, borderIntervalY };
   }
 
-  private getGridCoordinate(row: number, col: number, borderIntervalX: number, borderIntervalY: number){
+  private getGridCoordinate(row: number, col: number, borderIntervalX: number, borderIntervalY: number) {
     const x = borderIntervalX + col * this.cellSize;
     const y = borderIntervalY + row * this.cellSize;
-    return { x, y }
+    return { x, y };
   }
 
   public drawStartPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
@@ -138,29 +134,25 @@ export class Grid {
       const cols = this.cells[0].length;
 
       let cellFound = false;
-      
       const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
       
       while (!cellFound) {
         const randomRow = Math.floor(Math.random() * rows);
         const randomCol = Math.floor(Math.random() * cols);
 
-        // Verifica se a célula não está bloqueada e não está na última linha
         if (!this.cells[randomRow][randomCol].blocked && randomRow < rows - 1) {
-          const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY)
-
-          this.startPipePosition = { x, y }; // Salva a posição inicial
+          const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY);
+          this.startPipePosition = { x, y };
           cellFound = true;
         }
       }
-      if (!this.startPipe) { // Verifica se a instância do Pipe ainda não foi criada
-        this.startPipe = new Pipe(); // Cria uma nova instância de Pipe apenas uma vez
+      if (!this.startPipe) {
+        this.startPipe = new Pipe();
       }
     }
 
-    // Garante que a posição salva será usada para desenhar o start pipe
     const { x, y } = this.startPipePosition!;
-    this.startPipe?.drawStartPipe(ctx, x, y, cellSize); // Usa a mesma instância de Pipe
+    this.startPipe?.drawStartPipe(ctx, x, y, cellSize);
   }
 }
 

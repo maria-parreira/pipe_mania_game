@@ -4,13 +4,21 @@ import { PipeQueue } from "./PipeQueue";
 import { Pipe } from "./Pipe";
 
 
+/**
+ * The Game class represents the main game logic and rendering.
+ * It manages the game canvas, grid, and pipe queue, and handles user interactions.
+ * 
+ * It initializes the game with a given canvas and grid, sets up event listeners for user input,
+ * and provides methods to start the game and draw the game state on the canvas.
+ */
+
 export class Game {
 
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  grid: Grid; // Inicialização do grid
+  grid: Grid;
   pipeQueue: PipeQueue = new PipeQueue(5);
-  private selectedPipe: Pipe | null = null; // Armazena a pipe selecionada
+  private selectedPipe: Pipe | null = null;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -22,53 +30,48 @@ export class Game {
     this.ctx = canvas.getContext("2d")!;
     this.grid = grid;
 
-    // Events
     this.addEventListeners();
     this.startGame();
   }
 
-  // inicia do jogo
-  startGame() {
-    this.drawGame(); // chama a função para desenhar o jogo
+  public startGame() {
+    this.drawGame();
   }
 
-  drawGame() {
-    this.grid.drawGrid(this.ctx); // desenha o grid
-    this.grid.drawStartPipeInGrid(this.ctx,50);
-    this.pipeQueue.drawPipeQueue(this.ctx, 0, 10); // desenha a fila de pipes
+  private drawGame() {
+    this.grid.drawGrid(this.ctx);
+    this.grid.drawStartPipeInGrid(this.ctx, 50);
+    this.pipeQueue.drawPipeQueue(this.ctx, 0, 10);
   }
 
+  private addEventListeners() {
+    this.canvas.addEventListener("click", this.handleGridClick.bind(this));
+    this.canvas.addEventListener("click", this.handlePipeSelection.bind(this));
+  }
 
-  // Função para escolher aleatoriamente uma célula inicial
+  private handleGridClick(event: MouseEvent) {
+    const x = event.clientX - this.grid.getStartX(this.ctx);
+    const y = event.clientY - this.grid.getStartY(this.ctx);
+    const col = Math.floor(x / GameConfiguration.cellSize);
+    const row = Math.floor(y / GameConfiguration.cellSize);
 
-    addEventListeners() {
-      this.canvas.addEventListener("click", (event) => {
-        const x = event.clientX - this.grid.getStartX(this.ctx);
-        const y = event.clientY - this.grid.getStartY(this.ctx);
-        const col = Math.floor(x / GameConfiguration.cellSize);
-        const row = Math.floor(y / GameConfiguration.cellSize);
-  
-        // Verifica se a célula está dentro dos limites da grid
-        if (row >= 0 && row < GameConfiguration.rows && col >= 0 && col < GameConfiguration.cols) {
-          if (this.selectedPipe) { // Verifica se uma pipe foi selecionada
-            const placed = this.grid.setCellPipe(row, col, this.selectedPipe); // Altera o pipe na célula
-            if (placed) {
-              this.drawGame(); // Redesenha o jogo após a substituição do tubo
-            } 
-          }
-        }
-      });
-
-      // Adiciona evento para selecionar a primeira pipe da fila
-      this.canvas.addEventListener("click", () => {
-        const firstPipe = this.pipeQueue.getFirstPipe(); // Método que deve ser implementado na PipeQueue
-        if (firstPipe) {
-          this.selectedPipe = firstPipe; // Seleciona a primeira pipe
-          // Remove a pipe da fila e gera uma nova para adicionar ao final
-          this.pipeQueue.removeFirstPipe(); // Método que deve ser implementado na PipeQueue
-          const newPipe = this.pipeQueue.generatePipe(); // Método que deve ser implementado na PipeQueue
-          this.pipeQueue.addPipe(newPipe); // Adiciona a nova pipe ao final da fila
-        }
-      });
+    if (row >= 0 && row < GameConfiguration.rows && col >= 0 && col < GameConfiguration.cols) {
+      if (this.selectedPipe) {
+        const placed = this.grid.setCellPipe(row, col, this.selectedPipe);
+        if (placed) {
+          this.drawGame();
+        } 
+      }
     }
   }
+
+  private handlePipeSelection() {
+    const firstPipe = this.pipeQueue.getFirstPipe();
+    if (firstPipe) {
+      this.selectedPipe = firstPipe;
+      this.pipeQueue.removeFirst();
+      const newPipe = this.pipeQueue.generatePipe();
+      this.pipeQueue.addLast(newPipe);
+    }
+  }
+}
