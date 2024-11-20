@@ -5,10 +5,12 @@ export type PipeType = "horizontal" | "curvedUp" | "curvedDown" | "cross" | "ver
 export class Pipe {
 
   private image: HTMLImageElement; // Stores the corresponding image for the pipe
+  private startImage: HTMLImageElement; // Stores the initial image for the pipe
 
   constructor() {
     const type = this.getRandomPipeType(); // Escolhendo um tipo aleatório
     this.image = this.getImageByType(type); // Sets the image based on the type
+    this.startImage = this.getStartImage(); // Sets the initial image for the pipe
   }
 
   private getRandomPipeType(): PipeType {
@@ -35,7 +37,7 @@ export class Pipe {
     }
   }
 
-  drawPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+  public drawPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
     if (this.image.complete) {
         ctx.drawImage(this.image, x, y, size, size);
     } else {
@@ -46,12 +48,15 @@ export class Pipe {
   }
 
   // desenha a pipe start
-  drawStartPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+  public drawStartPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+    ctx.drawImage(this.startImage, x, y, size, size); // Uses the stored initial image
+  }
+
+  // Novo método para obter a imagem do tubo inicial
+  private getStartImage(): HTMLImageElement {
     const startTypes = Object.keys(startImages) as Array<keyof typeof startImages>;
     const randomIndex = Math.floor(Math.random() * startTypes.length);
-    const randomStartImage = startImages[startTypes[randomIndex]];
-    
-    ctx.drawImage(randomStartImage, x, y, size, size); 
+    return startImages[startTypes[randomIndex]]; // Retorna uma imagem aleatória para o tubo inicial
   }
 
 }

@@ -13,6 +13,7 @@ export class Grid {
   private cellSize: number;
   private cells: { pipe: Pipe | null; blocked: boolean; water: boolean }[][]; // represents the state of the cell 
   private startPipePosition: { x: number; y: number } | null = null;
+  private startPipe: Pipe | null = null; // Armazena a instância do Pipe
 
   // public 
   constructor(rows: number, cols: number, cellSize: number) {
@@ -106,12 +107,10 @@ export class Grid {
       ctx.fillRect(x, y, this.cellSize, this.cellSize);
     }
 
-    // Desenha o pipe
     if (cell.pipe) {
       cell.pipe.drawPipe(ctx, x, y, this.cellSize);
     }
 
-    // Borda da célula
     ctx.strokeStyle = "black";
     ctx.strokeRect(x, y, this.cellSize, this.cellSize);
   }
@@ -154,12 +153,14 @@ export class Grid {
           cellFound = true;
         }
       }
+      if (!this.startPipe) { // Verifica se a instância do Pipe ainda não foi criada
+        this.startPipe = new Pipe(); // Cria uma nova instância de Pipe apenas uma vez
+      }
     }
 
     // Garante que a posição salva será usada para desenhar o start pipe
     const { x, y } = this.startPipePosition!;
-    const pipe = new Pipe(); // Cria uma nova instância de Pipe
-    pipe.drawStartPipe(ctx, x, y, cellSize); // Desenha o start pipe na célula salva
+    this.startPipe?.drawStartPipe(ctx, x, y, cellSize); // Usa a mesma instância de Pipe
   }
 }
 
