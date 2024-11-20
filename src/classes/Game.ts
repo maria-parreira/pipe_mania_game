@@ -19,13 +19,14 @@ export class Game {
   grid: Grid;
   pipeQueue: PipeQueue = new PipeQueue(5);
   private selectedPipe: Pipe | null = null;
+  private isRunning: boolean = true; // Controle do loop
 
   constructor(
     canvas: HTMLCanvasElement,
     queueContainer: HTMLElement,
     gameStatus: HTMLElement,
     grid: Grid
-) {
+  ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.grid = grid;
@@ -35,20 +36,35 @@ export class Game {
   }
 
   public startGame() {
-    this.drawGame();
+    this.runGameLoop();
+  }
+
+  private runGameLoop() {
+    const gameLoop = () => {
+      if (this.isRunning) {
+        this.drawGame();
+        requestAnimationFrame(gameLoop);
+      }
+    };
+    requestAnimationFrame(gameLoop);
   }
 
   private drawGame() {
+    // Limpa o canvas antes de redesenhar
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Renderiza os elementos do jogo
     this.grid.drawGrid(this.ctx);
     this.grid.drawStartPipeInGrid(this.ctx, 50);
-    this.grid.drawEndPipeInGrid(this.ctx,50);
+    this.grid.drawEndPipeInGrid(this.ctx, 50);
     this.pipeQueue.drawPipeQueue(this.ctx, 0, 10);
   }
 
   private addEventListeners() {
     this.canvas.addEventListener("click", this.handleGridClick.bind(this));
-    this.canvas.addEventListener("click", this.handlePipeSelection.bind(this));
   }
+
+
 
   private handleGridClick(event: MouseEvent) {
     const x = event.clientX - this.grid.getStartX(this.ctx);
@@ -57,11 +73,9 @@ export class Game {
     const row = Math.floor(y / GameConfiguration.cellSize);
 
     if (row >= 0 && row < GameConfiguration.rows && col >= 0 && col < GameConfiguration.cols) {
+      this.handlePipeSelection();
       if (this.selectedPipe) {
-        const placed = this.grid.setCellPipe(row, col, this.selectedPipe);
-        if (placed) {
-          this.drawGame();
-        } 
+        this.grid.setCellPipe(row, col, this.selectedPipe);
       }
     }
   }
