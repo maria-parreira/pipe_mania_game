@@ -1,7 +1,6 @@
 ﻿import { Grid } from "./Grid";
-import { GameConfiguration } from "./GameConfiguration"; 
+import { GameConfiguration } from "../configuration/gameConfiguration"; 
 import { PipeQueue } from "./PipeQueue";
-import { Cell } from "./Cell";
 import { Pipe } from "./Pipe";
 
 
@@ -9,7 +8,6 @@ export class Game {
 
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  gameStatus: HTMLElement;  // neste momento nao esta a ser usado
   grid: Grid; // Inicialização do grid
   pipeQueue: PipeQueue = new PipeQueue(5);
   private selectedPipe: Pipe | null = null; // Armazena a pipe selecionada
@@ -22,7 +20,6 @@ export class Game {
 ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
-    this.gameStatus = gameStatus;
     this.grid = grid;
 
     // Events
@@ -33,17 +30,13 @@ export class Game {
   // inicia do jogo
   startGame() {
     this.drawGame(); // chama a função para desenhar o jogo
-    this.gameStatus.textContent = "Game started. Build your path!";
   }
 
   drawGame() {
     this.grid.drawGrid(this.ctx); // desenha o grid
-    this.grid.drawStartPipeInGrid(this.ctx, 50)
+    this.grid.drawStartPipeInGrid(this.ctx,50);
     this.pipeQueue.drawPipeQueue(this.ctx, 0, 10); // desenha a fila de pipes
   }
-
-
-  
 
 
   // Função para escolher aleatoriamente uma célula inicial

@@ -1,5 +1,5 @@
 ﻿import { Game } from "./classes/Game";
-import { GameConfiguration } from "./classes/GameConfiguration";
+import { GameConfiguration } from "./configuration/gameConfiguration";
 import { Grid } from "./classes/Grid";
 
 document.addEventListener("DOMContentLoaded", () => {

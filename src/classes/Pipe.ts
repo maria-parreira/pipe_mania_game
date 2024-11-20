@@ -1,4 +1,4 @@
-﻿import { images, startImages } from "./GameConfiguration";
+﻿import { images, startImages } from "../configuration/gameConfiguration";
 
 export type PipeType = "horizontal" | "curvedUp" | "curvedDown" | "cross" | "vertical"
 

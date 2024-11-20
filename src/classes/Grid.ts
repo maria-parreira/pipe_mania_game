@@ -12,6 +12,7 @@ export class Grid {
   private cols: number;
   private cellSize: number;
   private cells: { pipe: Pipe | null; blocked: boolean; water: boolean }[][]; // represents the state of the cell 
+  private startPipePosition: { x: number; y: number } | null = null;
 
   // public 
   constructor(rows: number, cols: number, cellSize: number) {
@@ -100,63 +101,65 @@ export class Grid {
 
 
   public drawGrid(ctx: CanvasRenderingContext2D) {
-    ctx.clearRect(0, 0, this.cols * this.cellSize, this.rows * this.cellSize ); 
+    ctx.clearRect(0, 0, this.cols * this.cellSize, this.rows * this.cellSize); 
 
-    const borderIntervalX =  this.getBorderIntervalX(ctx)// Calcula a posição X para centralizar
+    const borderIntervalX = this.getBorderIntervalX(ctx); // Calcula a posição X para centralizar
     const borderIntervalY = this.getBorderIntervalY(ctx); // Calcula a posição Y para centralizar
 
     for (let row = 0; row < this.rows; row++) {
-      for (let col = 0; col < this.cols; col++) {
-        const cell = this.cells[row][col];
-        const x = borderIntervalX + col * this.cellSize; // Usa a posição X centralizada
-        const y = borderIntervalY + row * this.cellSize; // Usa a posição Y centralizada
+        for (let col = 0; col < this.cols; col++) {
+            const cell = this.cells[row][col];
+            const x = borderIntervalX + col * this.cellSize; // Usa a posição X centralizada
+            const y = borderIntervalY + row * this.cellSize; // Usa a posição Y centralizada
 
-        // Draw blocked cell
-        if (cell.blocked) {
-          ctx.fillStyle = "gray";
-          ctx.fillRect(x, y, this.cellSize, this.cellSize);
+            // Desenha a célula bloqueada
+            if (cell.blocked) {
+                ctx.fillStyle = "gray";
+                ctx.fillRect(x, y, this.cellSize, this.cellSize);
+            }
+
+            // Desenha o pipe
+            if (cell.pipe) {
+                cell.pipe.drawPipe(ctx, x, y, this.cellSize);
+            }
+
+            // Borda da célula
+            ctx.strokeStyle = "black";
+            ctx.strokeRect(x, y, this.cellSize, this.cellSize);
         }
-
-        // Draw pipe
-        if (cell.pipe) {
-          cell.pipe.drawPipe(ctx, x, y, this.cellSize);
-        }
-
-        // Cell border
-        ctx.strokeStyle = "black";
-        ctx.strokeRect(x, y, this.cellSize, this.cellSize);
-      }
+        
     }
   }
   
+  public drawStartPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
+    if (!this.startPipePosition) {
+      const rows = this.cells.length;
+      const cols = this.cells[0].length;
 
+      let cellFound = false;
+      
+      const borderIntervalX = this.getBorderIntervalX(ctx); // Calcula a posição X para centralizar
+      const borderIntervalY = this.getBorderIntervalY(ctx);
+      
+      while (!cellFound) {
+        const randomRow = Math.floor(Math.random() * rows);
+        const randomCol = Math.floor(Math.random() * cols);
 
-public drawStartPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
-  const rows = this.cells.length;
-  const cols = this.cells[0].length;
+        // Verifica se a célula não está bloqueada e não está na última linha
+        if (!this.cells[randomRow][randomCol].blocked && randomRow < rows - 1) {
+          const x = borderIntervalX + randomCol * cellSize;
+          const y = borderIntervalY + randomRow * cellSize;
 
-  let cellFound = false;
-  let pipe = new Pipe(); // Cria uma nova instância de Pipe
-  let x: number | undefined; // Declaração da variável x como undefined
-  let y: number | undefined; // Alterado para permitir que y seja indefinido inicialmente
-
-  while (!cellFound) {
-      const randomRow = Math.floor(Math.random() * rows);
-      const randomCol = Math.floor(Math.random() * cols);
-
-      // Verifica se a célula não está bloqueada e não está na última linha
-      if (!this.cells[randomRow][randomCol].blocked && randomRow < rows - 1) {
-          x = randomCol * cellSize; // Calcula a posição X
-          y = randomRow * cellSize; // Calcula a posição Y
+          this.startPipePosition = { x, y }; // Salva a posição inicial
           cellFound = true;
+        }
       }
-  }
+    }
 
-  // Adiciona verificação para garantir que x e y foram atribuídos antes de usá-los
-  if (x !== undefined && y !== undefined) {
-    pipe.drawStartPipe(ctx, x, y, cellSize); // Desenha a start pipe na célula encontrada
+    // Garante que a posição salva será usada para desenhar o start pipe
+    const { x, y } = this.startPipePosition!;
+    const pipe = new Pipe(); // Cria uma nova instância de Pipe
+    pipe.drawStartPipe(ctx, x, y, cellSize); // Desenha o start pipe na célula salva
   }
 }
 
-
-}
