@@ -1,21 +1,6 @@
-﻿export type PipeType = "horizontal" | "curvedUp" | "curvedDown" | "cross" | "vertical"
+﻿import { images, startImages } from "./GameConfiguration";
 
-
-const images = {
-  vertical: new Image(),
-  horizontal: new Image(),
-  curvedUp: new Image(),
-  curvedDown: new Image(),
-  tJunction: new Image(),
-  cross: new Image(),
-};
-
-images.vertical.src = 'src/assets/vertical.png';
-images.horizontal.src = 'src/assets/horizontal.png'
-images.curvedUp.src = 'src/assets/curvedUp.png';
-images.curvedDown.src = 'src/assets/curvedDown.png';
-images.cross.src = 'src/assets/cross.png';
-
+export type PipeType = "horizontal" | "curvedUp" | "curvedDown" | "cross" | "vertical"
 
 export class Pipe {
 
@@ -59,6 +44,16 @@ export class Pipe {
         };
     }
   }
+
+  // desenha a pipe start
+  drawStartPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+    const startTypes = Object.keys(startImages) as Array<keyof typeof startImages>;
+    const randomIndex = Math.floor(Math.random() * startTypes.length);
+    const randomStartImage = startImages[startTypes[randomIndex]];
+    
+    ctx.drawImage(randomStartImage, x, y, size, size); 
+  }
+
 }
 
 

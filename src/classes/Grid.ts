@@ -128,7 +128,35 @@ export class Grid {
       }
     }
   }
+  
 
+
+public drawStartPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
+  const rows = this.cells.length;
+  const cols = this.cells[0].length;
+
+  let cellFound = false;
+  let pipe = new Pipe(); // Cria uma nova instância de Pipe
+  let x: number | undefined; // Declaração da variável x como undefined
+  let y: number | undefined; // Alterado para permitir que y seja indefinido inicialmente
+
+  while (!cellFound) {
+      const randomRow = Math.floor(Math.random() * rows);
+      const randomCol = Math.floor(Math.random() * cols);
+
+      // Verifica se a célula não está bloqueada e não está na última linha
+      if (!this.cells[randomRow][randomCol].blocked && randomRow < rows - 1) {
+          x = randomCol * cellSize; // Calcula a posição X
+          y = randomRow * cellSize; // Calcula a posição Y
+          cellFound = true;
+      }
+  }
+
+  // Adiciona verificação para garantir que x e y foram atribuídos antes de usá-los
+  if (x !== undefined && y !== undefined) {
+    pipe.drawStartPipe(ctx, x, y, cellSize); // Desenha a start pipe na célula encontrada
+  }
+}
 
 
 }

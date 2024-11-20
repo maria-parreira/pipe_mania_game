@@ -38,10 +38,12 @@ export class Game {
 
   drawGame() {
     this.grid.drawGrid(this.ctx); // desenha o grid
+    this.grid.drawStartPipeInGrid(this.ctx, 50)
     this.pipeQueue.drawPipeQueue(this.ctx, 0, 10); // desenha a fila de pipes
   }
 
 
+  
 
 
   // Função para escolher aleatoriamente uma célula inicial
@@ -58,32 +60,21 @@ export class Game {
           if (this.selectedPipe) { // Verifica se uma pipe foi selecionada
             const placed = this.grid.setCellPipe(row, col, this.selectedPipe); // Altera o pipe na célula
             if (placed) {
-              console.log("Pipe substituída na célula:", row, col); // Log para confirmar a substituição
               this.drawGame(); // Redesenha o jogo após a substituição do tubo
-            } else {
-              console.log("Falha ao substituir a pipe na célula."); // Log caso a substituição falhe
-            }
-          } else {
-            console.log("Nenhuma pipe selecionada."); // Log caso não haja pipe selecionada
+            } 
           }
         }
       });
 
       // Adiciona evento para selecionar a primeira pipe da fila
       this.canvas.addEventListener("click", () => {
-        console.log("Clique detectado no queueContainer."); // Log para verificar se o evento de clique é acionado
         const firstPipe = this.pipeQueue.getFirstPipe(); // Método que deve ser implementado na PipeQueue
-        console.log("Primeira pipe selecionada:", firstPipe); // Log para verificar a pipe selecionada
         if (firstPipe) {
           this.selectedPipe = firstPipe; // Seleciona a primeira pipe
-          console.log("Pipe selecionada com sucesso:", this.selectedPipe); // Log para confirmar a seleção
-          
           // Remove a pipe da fila e gera uma nova para adicionar ao final
           this.pipeQueue.removeFirstPipe(); // Método que deve ser implementado na PipeQueue
           const newPipe = this.pipeQueue.generatePipe(); // Método que deve ser implementado na PipeQueue
           this.pipeQueue.addPipe(newPipe); // Adiciona a nova pipe ao final da fila
-        } else {
-          console.log("Nenhuma pipe disponível para seleção."); // Log caso não haja pipe
         }
       });
     }
