@@ -61,33 +61,21 @@ export class Grid {
     return grid;
   }
 
-  public getBorderIntervalX(ctx:CanvasRenderingContext2D){
-    return (ctx.canvas.width - (this.cols * this.cellSize)) / 2;
-  }
-
-  public getBorderIntervalY(ctx:CanvasRenderingContext2D){
-    return (ctx.canvas.height - (this.rows * this.cellSize)) / 2;
-  }
-
   public getStartX(ctx:CanvasRenderingContext2D){
     return ctx.canvas.getBoundingClientRect().x+this.getBorderIntervalX(ctx);
+  }
+
+  private getBorderIntervalX(ctx:CanvasRenderingContext2D){
+    return (ctx.canvas.width - (this.cols * this.cellSize)) / 2;
   }
 
   public getStartY(ctx:CanvasRenderingContext2D){
     return ctx.canvas.getBoundingClientRect().y+this.getBorderIntervalY(ctx);
   }
 
-
-  // is responsible for placing a pipe in a specific cell of the grid.
-  public placePipe(row: number, col: number, pipe: Pipe): boolean {
-    if (this.cells[row][col].blocked || this.cells[row][col].pipe) {
-      return false;
-    }
-
-    this.cells[row][col].pipe = pipe;
-    return true;
+  private getBorderIntervalY(ctx:CanvasRenderingContext2D){
+    return (ctx.canvas.height - (this.rows * this.cellSize)) / 2;
   }
-
 
   // Método para obter uma célula e alterar o pipe que está nessa célula
   public setCellPipe(row: number, col: number, newPipe: Pipe): boolean {
@@ -99,38 +87,52 @@ export class Grid {
     return true; // Sucesso na alteração
   }
 
-
   public drawGrid(ctx: CanvasRenderingContext2D) {
-    ctx.clearRect(0, 0, this.cols * this.cellSize, this.rows * this.cellSize); 
-
-    const borderIntervalX = this.getBorderIntervalX(ctx); // Calcula a posição X para centralizar
-    const borderIntervalY = this.getBorderIntervalY(ctx); // Calcula a posição Y para centralizar
+    ctx.clearRect(0, 0, this.cols * this.cellSize, this.rows * this.cellSize);
 
     for (let row = 0; row < this.rows; row++) {
-        for (let col = 0; col < this.cols; col++) {
-            const cell = this.cells[row][col];
-            const x = borderIntervalX + col * this.cellSize; // Usa a posição X centralizada
-            const y = borderIntervalY + row * this.cellSize; // Usa a posição Y centralizada
-
-            // Desenha a célula bloqueada
-            if (cell.blocked) {
-                ctx.fillStyle = "gray";
-                ctx.fillRect(x, y, this.cellSize, this.cellSize);
-            }
-
-            // Desenha o pipe
-            if (cell.pipe) {
-                cell.pipe.drawPipe(ctx, x, y, this.cellSize);
-            }
-
-            // Borda da célula
-            ctx.strokeStyle = "black";
-            ctx.strokeRect(x, y, this.cellSize, this.cellSize);
-        }
-        
+      for (let col = 0; col < this.cols; col++) {
+        this.drawCell(ctx, row, col); // Chama o método para desenhar a célula
+      }
     }
   }
-  
+
+  private drawCell(ctx: CanvasRenderingContext2D, row: number, col: number) {
+    const cell = this.cells[row][col];
+    const { x, y } = this.getCellPosition(row, col, ctx);
+
+    if (cell.blocked) {
+      ctx.fillStyle = "gray";
+      ctx.fillRect(x, y, this.cellSize, this.cellSize);
+    }
+
+    // Desenha o pipe
+    if (cell.pipe) {
+      cell.pipe.drawPipe(ctx, x, y, this.cellSize);
+    }
+
+    // Borda da célula
+    ctx.strokeStyle = "black";
+    ctx.strokeRect(x, y, this.cellSize, this.cellSize);
+  }
+
+  private getCellPosition(row: number, col: number, ctx: CanvasRenderingContext2D) {
+    const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
+    return this.getGridCoordinate(row, col, borderIntervalX, borderIntervalY);
+  }
+
+  private getBorderIntervals(ctx: CanvasRenderingContext2D){
+    const borderIntervalX = this.getBorderIntervalX(ctx); 
+    const borderIntervalY = this.getBorderIntervalY(ctx);
+    return { borderIntervalX, borderIntervalY };
+  }
+
+  private getGridCoordinate(row: number, col: number, borderIntervalX: number, borderIntervalY: number){
+    const x = borderIntervalX + col * this.cellSize;
+    const y = borderIntervalY + row * this.cellSize;
+    return { x, y }
+  }
+
   public drawStartPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
     if (!this.startPipePosition) {
       const rows = this.cells.length;
@@ -138,8 +140,7 @@ export class Grid {
 
       let cellFound = false;
       
-      const borderIntervalX = this.getBorderIntervalX(ctx); // Calcula a posição X para centralizar
-      const borderIntervalY = this.getBorderIntervalY(ctx);
+      const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
       
       while (!cellFound) {
         const randomRow = Math.floor(Math.random() * rows);
@@ -147,8 +148,7 @@ export class Grid {
 
         // Verifica se a célula não está bloqueada e não está na última linha
         if (!this.cells[randomRow][randomCol].blocked && randomRow < rows - 1) {
-          const x = borderIntervalX + randomCol * cellSize;
-          const y = borderIntervalY + randomRow * cellSize;
+          const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY)
 
           this.startPipePosition = { x, y }; // Salva a posição inicial
           cellFound = true;
