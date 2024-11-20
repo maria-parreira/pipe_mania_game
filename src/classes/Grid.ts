@@ -132,19 +132,13 @@ export class Grid {
 
   public drawStartPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
     if (!this.startPipePosition) {
-      const rows = this.cells.length;
-      const cols = this.cells[0].length;
 
       let cellFound = false;
-      const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
       
       while (!cellFound) {
-        const randomRow = Math.floor(Math.random() * rows);
-        const randomCol = Math.floor(Math.random() * cols);
+        const {randomRow, randomCol } = this.generateRandomPipePosition();
 
-        if (!this.cells[randomRow][randomCol].blocked && randomRow < rows - 1) {
-          const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY);
-          this.startPipePosition = { x, y };
+        if(this.areStartPipeCoordinatesValid(randomRow, randomCol, ctx)){
           cellFound = true;
         }
       }
@@ -157,28 +151,25 @@ export class Grid {
     this.startPipe?.drawStartPipe(ctx, x, y, cellSize);
   }
 
-  public drawEndPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
-    const rows = this.cells.length;
-    const cols = this.cells[0].length;
-
-    let cellFound = false;
+  private areStartPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: CanvasRenderingContext2D){
     const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
+
+    if (!this.cells[randomRow][randomCol].blocked && randomRow < this.cells.length - 1) {
+      const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY);
+      this.startPipePosition = { x, y };
+      return true;
+    }
+    return false;
+  }
+
+  public drawEndPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
+    let cellFound = false;
     
     while (!cellFound) {
-        const randomRow = Math.floor(Math.random() * rows);
-        const randomCol = Math.floor(Math.random() * cols);
+        const {randomRow, randomCol } = this.generateRandomPipePosition();
 
-        if (!this.cells[randomRow][randomCol].blocked && randomRow < rows - 1) {
-          if (this.startPipePosition) {
-            const startRow = Math.floor(this.startPipePosition.y / this.cellSize);
-            const startCol = Math.floor(this.startPipePosition.x / this.cellSize);
-            if (Math.abs(randomRow - startRow) < 3 && Math.abs(randomCol - startCol) < 3) {
-              continue;
-            }
-          }
-          const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY);
-          this.endPipePosition = { x, y }; 
-          cellFound = true;
+        if(this.areEndPipeCoordinatesValid(randomRow, randomCol, ctx)){
+          cellFound = true ;
         }
     }
 
@@ -186,6 +177,40 @@ export class Grid {
     this.endPipe?.drawEndPipe(ctx, x, y, cellSize); 
   }
 
+  private generateRandomPipePosition(){
+    const rows = this.cells.length;
+    const cols = this.cells[0].length;
+
+    const randomRow = Math.floor(Math.random() * rows);
+    const randomCol = Math.floor(Math.random() * cols);
+
+    return {randomRow, randomCol};
+  }
+
+  private areEndPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: CanvasRenderingContext2D){
+    const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
+
+    if (!this.cells[randomRow][randomCol].blocked && randomRow < this.cells.length - 1) {
+      if(!this.isValidDistanceFromEndToStartPipes(randomRow, randomCol)){
+        return false;
+      }
+      const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY);
+      this.endPipePosition = { x, y }; 
+      return true;
+    }
+    return false;
+  }
+
+  private isValidDistanceFromEndToStartPipes(randomRow: number, randomCol: number){
+    if (this.startPipePosition) {
+      const startRow = Math.floor(this.startPipePosition.y / this.cellSize);
+      const startCol = Math.floor(this.startPipePosition.x / this.cellSize);
+      if (Math.abs(randomRow - startRow) < 3 && Math.abs(randomCol - startCol) < 3) {
+        return false;
+      }
+    }
+    return true;
+  }
 
 
 }
