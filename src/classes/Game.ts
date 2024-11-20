@@ -50,31 +50,15 @@ export class Game {
 
 
   // Função para escolher aleatoriamente uma célula inicial
-  /*chooseStartingCell(cells: Cell[]): Cell | null {
-    const validCells = cells.filter(cell => cell.canBeStartingCell(cells));
-    if (validCells.length === 0) return null;
-    const randomIndex = Math.floor(Math.random() * validCells.length);
-    return validCells[randomIndex];
-  }*/
 
     addEventListeners() {
       this.canvas.addEventListener("click", (event) => {
         const x = event.clientX - this.grid.getStartX(this.ctx);
         const y = event.clientY - this.grid.getStartY(this.ctx);
-  
-        console.log("clicked on X" + event.clientX);
-        console.log("clicked on Y" + event.clientY);
-
-        console.log("x = " + this.grid.getStartX(this.ctx));
-        console.log("y = " + this.grid.getStartY(this.ctx));
-
         const col = Math.floor(x / GameConfiguration.cellSize);
         const row = Math.floor(y / GameConfiguration.cellSize);
-
-        console.log("col = " + col);
-        console.log("row = " + row);
   
-        // Verifica se a célula está dentro dos limites da grade
+        // Verifica se a célula está dentro dos limites da grid
         if (row >= 0 && row < GameConfiguration.rows && col >= 0 && col < GameConfiguration.cols) {
           const pipe = new Pipe(); // Cria uma nova instância de Pipe
           const placed = this.grid.placePipe(row, col, pipe);
