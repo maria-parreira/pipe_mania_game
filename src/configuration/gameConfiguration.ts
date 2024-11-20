@@ -18,7 +18,8 @@ export const images = {
   startup:new Image(),
   startdown:new Image(),
   startleft:new Image(),
-  startright:new Image()
+  startright:new Image(),
+  end: new Image()
 };
 
 images.vertical.src = 'src/assets/pipes/vertical.png';
@@ -30,6 +31,7 @@ images.startup.src = 'src/assets/start/startUp.png';
 images.startdown.src = 'src/assets/start/startDown.png';
 images.startleft.src = 'src/assets/start/startLeft.png';
 images.startright.src = 'src/assets/start/startRight.png';
+images.end.src = 'src/assets/end/end.png';
 
 export const startImages = {
   startup: images.startup,

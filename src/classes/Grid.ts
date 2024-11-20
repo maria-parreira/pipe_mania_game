@@ -15,6 +15,8 @@ export class Grid {
   private cells: { pipe: Pipe | null; blocked: boolean; water: boolean }[][];
   private startPipePosition: { x: number; y: number } | null = null;
   private startPipe: Pipe | null = null;
+  private endPipePosition: { x: number; y: number } | null = null;
+  private endPipe: Pipe | null = null;
 
   constructor(rows: number, cols: number, cellSize: number) {
     this.rows = rows;
@@ -154,5 +156,37 @@ export class Grid {
     const { x, y } = this.startPipePosition!;
     this.startPipe?.drawStartPipe(ctx, x, y, cellSize);
   }
+
+  public drawEndPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
+    const rows = this.cells.length;
+    const cols = this.cells[0].length;
+
+    let cellFound = false;
+    const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
+    
+    while (!cellFound) {
+        const randomRow = Math.floor(Math.random() * rows);
+        const randomCol = Math.floor(Math.random() * cols);
+
+        if (!this.cells[randomRow][randomCol].blocked && randomRow < rows - 1) {
+          if (this.startPipePosition) {
+            const startRow = Math.floor(this.startPipePosition.y / this.cellSize);
+            const startCol = Math.floor(this.startPipePosition.x / this.cellSize);
+            if (Math.abs(randomRow - startRow) < 3 && Math.abs(randomCol - startCol) < 3) {
+              continue;
+            }
+          }
+          const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY);
+          this.endPipePosition = { x, y }; 
+          cellFound = true;
+        }
+    }
+
+    const { x, y } = this.endPipePosition!;
+    this.endPipe?.drawEndPipe(ctx, x, y, cellSize); 
+  }
+
+
+
 }
 

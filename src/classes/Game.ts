@@ -41,6 +41,7 @@ export class Game {
   private drawGame() {
     this.grid.drawGrid(this.ctx);
     this.grid.drawStartPipeInGrid(this.ctx, 50);
+    this.grid.drawEndPipeInGrid(this.ctx,50);
     this.pipeQueue.drawPipeQueue(this.ctx, 0, 10);
   }
 

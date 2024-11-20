@@ -57,11 +57,15 @@ export class Pipe {
     ctx.drawImage(this.startImage, x, y, size, size);
   }
 
-  private getStartImage(): HTMLImageElement {
-    const startTypes = Object.keys(startImages) as Array<keyof typeof startImages>;
-    const randomIndex = Math.floor(Math.random() * startTypes.length);
-    return startImages[startTypes[randomIndex]];
-  }
+  public drawEndPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+    ctx.drawImage(images.end, x, y, size, size);
+}
+
+private getStartImage(): HTMLImageElement {
+  const startTypes = Object.keys(startImages) as Array<keyof typeof startImages>;
+  const randomIndex = Math.floor(Math.random() * startTypes.length);
+  return startImages[startTypes[randomIndex]];
+}
 
 }
 
