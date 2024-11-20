@@ -1,5 +1,4 @@
 ﻿export type PipeType = "horizontal" | "curvedUp" | "curvedDown" | "cross" | "vertical"
-export type Direction = "top" | "bottom" | "left" | "right"; 
 
 
 const images = {
@@ -20,14 +19,10 @@ images.cross.src = 'src/assets/cross.png';
 
 export class Pipe {
 
-  private connections: Direction[]; // directions for connecting the piece 
   private image: HTMLImageElement; // Stores the corresponding image for the pipe
-  private rotation: number; // Adicionando a propriedade rotation
 
   constructor() {
     const type = this.getRandomPipeType(); // Escolhendo um tipo aleatório
-    this.rotation = this.getDefaultOrientation(type);
-    this.connections = this.getConnectionsByType(type);
     this.image = this.getImageByType(type); // Sets the image based on the type
   }
 
@@ -37,22 +32,6 @@ export class Pipe {
     return types[randomIndex]; // Retorna um tipo aleatório
   }
 
-  private getDefaultOrientation(type: PipeType): number {
-    switch (type) {
-      case "horizontal":
-        return 0; 
-      case "curvedUp":
-        return 90;
-      case "curvedDown":
-        return 270;
-      case "cross":
-        return 270; 
-      case "vertical":
-        return 90; 
-      default:
-        throw new Error("invalid pipe type");
-    }
-  }
 
   private getImageByType(type: PipeType): HTMLImageElement {
     switch (type) {
@@ -71,28 +50,7 @@ export class Pipe {
     }
   }
 
-  private getConnectionsByType(type: PipeType): Direction[] {
-    switch (type) {
-      case "vertical":
-        return ["top", "bottom"]; 
-      case "horizontal":
-        return ["left", "right"]; 
-      case "curvedUp":
-        return ["bottom", "left"]; 
-      case "curvedDown":
-        return ["top", "right"]; 
-      case "cross":
-        return ["top", "bottom", "left", "right"]; 
-      default:
-        throw new Error("invalid pipe type");
-    }
-  }
-
-  connectsTo(direction: Direction): boolean {
-    return this.connections.includes(direction);
-  }
-
-  draw(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+  drawPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
     if (this.image.complete) {
         ctx.drawImage(this.image, x, y, size, size);
     } else {

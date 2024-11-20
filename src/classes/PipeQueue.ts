@@ -18,6 +18,9 @@ const Queue = <T>() => {
     },
     getItems(): T[] {
       return items; // Método para acessar os itens da fila
+    },
+    peek(): T | undefined { // Método para obter o primeiro item sem removê-lo
+      return items[0]; // Retorna o primeiro item da fila
     }
   };
 };
@@ -31,8 +34,12 @@ export class PipeQueue {
     }
   }
 
-  private generatePipe(): Pipe {
+  public generatePipe(): Pipe {
     return new Pipe(); // Aqui você pode usar randomType se necessário
+  }
+
+  public getFirstPipe(): Pipe {
+    return this.queue.peek()!; // Adiciona o operador de asserção não nula
   }
 
 
@@ -43,11 +50,22 @@ export class PipeQueue {
     // Itera sobre a fila de tubos e desenha cada um
     this.queue.getItems().forEach((pipe, index) => {
       const pipeY = y + index * (pipeSize + pipeSpacing); // Calcula a posição Y para cada tubo
-      pipe.draw(ctx, x, pipeY, pipeSize); // Desenha o tubo no canvas
+      pipe.drawPipe(ctx, x, pipeY, pipeSize); // Desenha o tubo no canvas
     });
   }
 
   public getQueue(): Pipe[] { 
     return this.queue.getItems(); // Retorna a fila de tubos
   }
+
+  removeFirstPipe() {
+    // Lógica para remover a primeira pipe da fila
+    this.queue.dequeue(); // Corrigido para usar o método dequeue
+  }
+
+  addPipe(pipe: Pipe) {
+    this.queue.enqueue(pipe); // Corrigido para usar o método enqueue
+  }
+
+
 }

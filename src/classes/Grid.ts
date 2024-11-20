@@ -43,45 +43,6 @@ export class Grid {
     }
   }
 
-
-
-  /*
-  renders the grid of cells on the canvas, drawing each cell according to its state (blocked, 
-  containing pipe or water) and adding a border around each cell. It ensures that the grid visualization 
-  is updated whenever the method is called, allowing changes in the state of the cells to be 
-  reflected graphically.
-  */
-
-  public draw(ctx: CanvasRenderingContext2D) {
-    ctx.clearRect(0, 0, this.cols * this.cellSize, this.rows * this.cellSize ); 
-
-    const borderIntervalX =  this.getBorderIntervalX(ctx)// Calcula a posição X para centralizar
-    const borderIntervalY = this.getBorderIntervalY(ctx); // Calcula a posição Y para centralizar
-
-    for (let row = 0; row < this.rows; row++) {
-      for (let col = 0; col < this.cols; col++) {
-        const cell = this.cells[row][col];
-        const x = borderIntervalX + col * this.cellSize; // Usa a posição X centralizada
-        const y = borderIntervalY + row * this.cellSize; // Usa a posição Y centralizada
-
-        // Draw blocked cell
-        if (cell.blocked) {
-          ctx.fillStyle = "gray";
-          ctx.fillRect(x, y, this.cellSize, this.cellSize);
-        }
-
-        // Draw pipe
-        if (cell.pipe) {
-          cell.pipe.draw(ctx, x, y, this.cellSize);
-        }
-
-        // Cell border
-        ctx.strokeStyle = "black";
-        ctx.strokeRect(x, y, this.cellSize, this.cellSize);
-      }
-    }
-  }
-
   public getBorderIntervalX(ctx:CanvasRenderingContext2D){
     return (ctx.canvas.width - (this.cols * this.cellSize)) / 2;
   }
@@ -108,5 +69,37 @@ export class Grid {
     this.cells[row][col].pipe = pipe;
     return true;
   }
+
+  public draw(ctx: CanvasRenderingContext2D) {
+    ctx.clearRect(0, 0, this.cols * this.cellSize, this.rows * this.cellSize ); 
+
+    const borderIntervalX =  this.getBorderIntervalX(ctx)// Calcula a posição X para centralizar
+    const borderIntervalY = this.getBorderIntervalY(ctx); // Calcula a posição Y para centralizar
+
+    for (let row = 0; row < this.rows; row++) {
+      for (let col = 0; col < this.cols; col++) {
+        const cell = this.cells[row][col];
+        const x = borderIntervalX + col * this.cellSize; // Usa a posição X centralizada
+        const y = borderIntervalY + row * this.cellSize; // Usa a posição Y centralizada
+
+        // Draw blocked cell
+        if (cell.blocked) {
+          ctx.fillStyle = "gray";
+          ctx.fillRect(x, y, this.cellSize, this.cellSize);
+        }
+
+        // Draw pipe
+        if (cell.pipe) {
+          cell.pipe.drawPipe(ctx, x, y, this.cellSize);
+        }
+
+        // Cell border
+        ctx.strokeStyle = "black";
+        ctx.strokeRect(x, y, this.cellSize, this.cellSize);
+      }
+    }
+  }
+
+
 
 }

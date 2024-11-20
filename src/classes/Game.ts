@@ -9,10 +9,10 @@ export class Game {
 
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  queueContainer: HTMLElement; // neste momento limpa o conteudo anterior da fila
   gameStatus: HTMLElement;  // neste momento nao esta a ser usado
   grid: Grid; // Inicialização do grid
   pipeQueue: PipeQueue = new PipeQueue(5);
+  private selectedPipe: Pipe | null = null; // Armazena a pipe selecionada
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -22,7 +22,6 @@ export class Game {
 ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
-    this.queueContainer = queueContainer; 
     this.gameStatus = gameStatus;
     this.grid = grid;
 
@@ -42,10 +41,6 @@ export class Game {
     this.pipeQueue.drawPipeQueue(this.ctx, 0, 10); // desenha a fila de pipes
   }
 
-  updateQueue() {
-    // Limpa o conteúdo anterior da fila
-    this.queueContainer.innerHTML = ""; 
-  }
 
 
 
@@ -60,11 +55,35 @@ export class Game {
   
         // Verifica se a célula está dentro dos limites da grid
         if (row >= 0 && row < GameConfiguration.rows && col >= 0 && col < GameConfiguration.cols) {
-          const pipe = new Pipe(); // Cria uma nova instância de Pipe
-          const placed = this.grid.placePipe(row, col, pipe);
-          if (placed) {
-            this.drawGame(); // Redesenha o jogo após a colocação do tubo
+          if (this.selectedPipe) { // Verifica se uma pipe foi selecionada
+            const placed = this.grid.placePipe(row, col, this.selectedPipe); // Coloca a pipe na célula
+            if (placed) {
+              console.log("Pipe colocada na célula:", row, col); // Log para confirmar a colocação
+              this.drawGame(); // Redesenha o jogo após a colocação do tubo
+            } else {
+              console.log("Falha ao colocar a pipe na célula."); // Log caso a colocação falhe
+            }
+          } else {
+            console.log("Nenhuma pipe selecionada."); // Log caso não haja pipe selecionada
           }
+        }
+      });
+
+      // Adiciona evento para selecionar a primeira pipe da fila
+      this.canvas.addEventListener("click", () => {
+        console.log("Clique detectado no queueContainer."); // Log para verificar se o evento de clique é acionado
+        const firstPipe = this.pipeQueue.getFirstPipe(); // Método que deve ser implementado na PipeQueue
+        console.log("Primeira pipe selecionada:", firstPipe); // Log para verificar a pipe selecionada
+        if (firstPipe) {
+          this.selectedPipe = firstPipe; // Seleciona a primeira pipe
+          console.log("Pipe selecionada com sucesso:", this.selectedPipe); // Log para confirmar a seleção
+          
+          // Remove a pipe da fila e gera uma nova para adicionar ao final
+          this.pipeQueue.removeFirstPipe(); // Método que deve ser implementado na PipeQueue
+          const newPipe = this.pipeQueue.generatePipe(); // Método que deve ser implementado na PipeQueue
+          this.pipeQueue.addPipe(newPipe); // Adiciona a nova pipe ao final da fila
+        } else {
+          console.log("Nenhuma pipe disponível para seleção."); // Log caso não haja pipe
         }
       });
     }
