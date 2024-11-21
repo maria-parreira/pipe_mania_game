@@ -132,7 +132,6 @@ export class Grid {
 
   public drawStartPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
     if (!this.startPipePosition) {
-
       let cellFound = false;
       
       while (!cellFound) {
@@ -163,14 +162,20 @@ export class Grid {
   }
 
   public drawEndPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
-    let cellFound = false;
-    
-    while (!cellFound) {
-        const {randomRow, randomCol } = this.generateRandomPipePosition();
+    if (!this.endPipePosition) {
+      let cellFound = false;
+      
+      while (!cellFound) {
+          const {randomRow, randomCol } = this.generateRandomPipePosition();
 
-        if(this.areEndPipeCoordinatesValid(randomRow, randomCol, ctx)){
-          cellFound = true ;
-        }
+          if(this.areEndPipeCoordinatesValid(randomRow, randomCol, ctx)){
+            cellFound = true ;
+          }
+      }
+
+      if (!this.endPipe) {
+        this.endPipe = new Pipe();
+      }
     }
 
     const { x, y } = this.endPipePosition!;
@@ -211,7 +216,6 @@ export class Grid {
     }
     return true;
   }
-
 
 }
 
