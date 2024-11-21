@@ -13,13 +13,17 @@ import { Pipe } from "./Pipe";
  */
 
 export class Game {
-
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   grid: Grid;
   pipeQueue: PipeQueue = new PipeQueue(5);
   private selectedPipe: Pipe | null = null;
-  private isRunning: boolean = true; // Controle do loop
+  private isRunning: boolean = true;
+
+  private countdown: number = 10; // Tempo restante para a água começar
+  private timerInterval: number | null = null; // Referência para o intervalo do temporizador
+
+  private score: number = 0; // Pontuação do jogador
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -36,12 +40,31 @@ export class Game {
   }
 
   public startGame() {
+    this.startCountdown(); // Inicia o temporizador de contagem regressiva
     this.runGameLoop();
+  }
+
+  private startCountdown() {
+    this.timerInterval = window.setInterval(() => {
+      if (this.countdown > 0) {
+        this.countdown--; // Diminui o contador
+      } else {
+        this.stopCountdown(); // Para o temporizador quando chega a 0
+      }
+    }, 1000); // Intervalo de 1 segundo
+  }
+
+  private stopCountdown() {
+    if (this.timerInterval !== null) {
+      clearInterval(this.timerInterval); // Para o intervalo
+      this.timerInterval = null;
+    }
   }
 
   private runGameLoop() {
     const gameLoop = () => {
       if (this.isRunning) {
+        this.updateGame();
         this.drawGame();
         requestAnimationFrame(gameLoop);
       }
@@ -49,22 +72,40 @@ export class Game {
     requestAnimationFrame(gameLoop);
   }
 
+  private updateGame() {
+    // Atualizações gerais do jogo podem ser adicionadas aqui
+  }
+
   private drawGame() {
-    // Limpa o canvas antes de redesenhar
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     // Renderiza os elementos do jogo
     this.grid.drawGrid(this.ctx);
     this.grid.drawStartPipeInGrid(this.ctx, 50);
-    this.grid.drawEndPipeInGrid(this.ctx, 50);
-    this.pipeQueue.drawPipeQueue(this.ctx, 0, 10);
+    this.pipeQueue.drawPipeQueue(this.ctx, 0, 150);
+
+    // Renderiza o HUD (incluindo o contador regressivo e pontuação)
+    this.drawHUD();
+  }
+
+  private drawHUD() {
+    this.ctx.font = "20px Arial";
+    this.ctx.fillStyle = "black";
+
+    // Renderiza a contagem regressiva
+    this.ctx.fillText(
+      `Time until water: ${this.countdown}s`,
+      10,
+      20
+    );
+
+    // Renderiza a pontuação
+    this.ctx.fillText(`Score: ${this.score}`, 10, 50);
   }
 
   private addEventListeners() {
     this.canvas.addEventListener("click", this.handleGridClick.bind(this));
   }
-
-
 
   private handleGridClick(event: MouseEvent) {
     const x = event.clientX - this.grid.getStartX(this.ctx);
@@ -76,6 +117,9 @@ export class Game {
       this.handlePipeSelection();
       if (this.selectedPipe) {
         this.grid.setCellPipe(row, col, this.selectedPipe);
+
+        // Incrementa a pontuação
+        this.score += 10; // Ajuste o valor da pontuação conforme necessário
       }
     }
   }
@@ -90,3 +134,5 @@ export class Game {
     }
   }
 }
+
+

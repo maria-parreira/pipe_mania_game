@@ -132,35 +132,115 @@ export class Grid {
 
   public drawStartPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
     if (!this.startPipePosition) {
-      let cellFound = false;
-      
-      while (!cellFound) {
-        const {randomRow, randomCol } = this.generateRandomPipePosition();
+        let cellFound = false;
 
-        if(this.areStartPipeCoordinatesValid(randomRow, randomCol, ctx)){
-          cellFound = true;
+        while (!cellFound) {
+            const { randomRow, randomCol } = this.generateRandomPipePosition();
+
+            if (this.areStartPipeCoordinatesValid(randomRow, randomCol, ctx)) {
+                cellFound = true;
+            }
         }
-      }
-      if (!this.startPipe) {
-        this.startPipe = new Pipe();
-      }
+
+        if (!this.startPipe) {
+            this.startPipe = new Pipe();
+        }
     }
 
     const { x, y } = this.startPipePosition!;
     this.startPipe?.drawStartPipe(ctx, x, y, cellSize);
-  }
+}
 
-  private areStartPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: CanvasRenderingContext2D){
-    const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
-
-    if (!this.cells[randomRow][randomCol].blocked && randomRow < this.cells.length - 1) {
-      const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY);
-      this.startPipePosition = { x, y };
-      return true;
+private areStartPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: CanvasRenderingContext2D): boolean {
+    // Verifica se a célula está na última linha (não pode ser na última linha)
+    if (randomRow === this.rows - 1) {
+        return false;
     }
-    return false;
+
+    // Verifica se a célula é válida (não bloqueada)
+    if (this.cells[randomRow][randomCol].blocked) {
+        return false;
+    }
+
+    // Verifica se as células vizinhas estão bloqueadas
+    const neighbors = this.getNeighboringCells(randomRow, randomCol);
+    for (const { row, col } of neighbors) {
+        if (this.isCellBlocked(row, col)) {
+            // Se uma célula vizinha está bloqueada, tenta mover a start pipe
+            return this.tryMoveStartPipe(randomRow, randomCol, ctx);
+        }
+    }
+
+    // Define a posição da start pipe no grid
+    const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
+    const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY);
+    this.startPipePosition = { x, y };
+    return true;
+}
+
+private tryMoveStartPipe(row: number, col: number, ctx: CanvasRenderingContext2D): boolean {
+    // Tenta deslocar a start pipe para as células vizinhas, com mais controle sobre a distância
+    const directions = [
+        { row: row - 1, col },  // Acima
+        { row: row + 1, col },  // Abaixo
+        { row, col: col - 1 },  // Esquerda
+        { row, col: col + 1 },  // Direita
+    ];
+
+    for (const { row: newRow, col: newCol } of directions) {
+        if (this.isValidCell(newRow, newCol) && !this.isCellBlocked(newRow, newCol)) {
+            // Verifica se a nova posição está livre e se não há bloqueios ao redor dela
+            const neighbors = this.getNeighboringCells(newRow, newCol);
+            const isValidPosition = neighbors.every(({ row, col }) => !this.isCellBlocked(row, col));
+
+            if (isValidPosition) {
+                const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
+                const { x, y } = this.getGridCoordinate(newRow, newCol, borderIntervalX, borderIntervalY);
+                this.startPipePosition = { x, y };
+                return true;
+            }
+        }
+    }
+    return false; // Se não encontrar uma posição válida, retorna false
+}
+
+private getNeighboringCells(row: number, col: number): { row: number; col: number }[] {
+    const directions = [
+        { row: -1, col: 0 }, // Acima
+        { row: 1, col: 0 },  // Abaixo
+        { row: 0, col: -1 }, // Esquerda
+        { row: 0, col: 1 }   // Direita
+    ];
+
+    return directions
+        .map(({ row: dRow, col: dCol }) => ({ row: row + dRow, col: col + dCol }))
+        .filter(({ row, col }) => this.isValidCell(row, col)); // Apenas células dentro do grid
+}
+
+private isValidCell(row: number, col: number): boolean {
+    return row >= 0 && row < this.rows && col >= 0 && col < this.cols;
+}
+
+private isCellBlocked(row: number, col: number): boolean {
+    if (!this.isValidCell(row, col)) {
+        return true; // Fora do grid é considerado bloqueado
+    }
+    return this.cells[row][col].blocked;
+}
+
+
+  private generateRandomPipePosition(){
+    const rows = this.cells.length;
+    const cols = this.cells[0].length;
+
+    const randomRow = Math.floor(Math.random() * rows);
+    const randomCol = Math.floor(Math.random() * cols);
+
+    return {randomRow, randomCol};
   }
 
+  
+/*
   public drawEndPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
     if (!this.endPipePosition) {
       let cellFound = false;
@@ -182,15 +262,6 @@ export class Grid {
     this.endPipe?.drawEndPipe(ctx, x, y, cellSize); 
   }
 
-  private generateRandomPipePosition(){
-    const rows = this.cells.length;
-    const cols = this.cells[0].length;
-
-    const randomRow = Math.floor(Math.random() * rows);
-    const randomCol = Math.floor(Math.random() * cols);
-
-    return {randomRow, randomCol};
-  }
 
   private areEndPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: CanvasRenderingContext2D){
     const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
@@ -216,6 +287,7 @@ export class Grid {
     }
     return true;
   }
+    */
 
 }
 
