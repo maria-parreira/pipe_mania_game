@@ -1,5 +1,5 @@
-﻿import { Pipe } from './Pipe';
-
+﻿import { images } from "../configuration/gameConfiguration";
+import { Pipe } from './Pipe';
 
 /**
  * The Grid class represents a two-dimensional grid structure that manages the state of each cell.
@@ -15,6 +15,7 @@ export class Grid {
   private cells: { pipe: Pipe | null; blocked: boolean; water: boolean }[][];
   private startPipePosition: { x: number; y: number } | null = null;
   private startPipe: Pipe | null = null;
+  private image: HTMLImageElement = images.bgcell;
 
   constructor(rows: number, cols: number, cellSize: number) {
     this.rows = rows;
@@ -94,17 +95,28 @@ export class Grid {
     }
   }
 
+  // Novo método para desenhar a célula
+  public drawoneCell(ctx: CanvasRenderingContext2D, x: number, y: number, size:number ): void {
+    if (this.image.complete) {
+        ctx.drawImage(this.image, x, y, size, size);
+      } else {
+        this.image.onload = () => {
+          ctx.drawImage(this.image, x, y, size, size);
+        };
+      }
+  }
+
   private drawCell(ctx: CanvasRenderingContext2D, row: number, col: number) {
     const cell = this.cells[row][col];
     const { x, y } = this.getCellPosition(row, col, ctx);
 
     if (cell.blocked) {
-      ctx.fillStyle = "gray";
-      ctx.fillRect(x, y, this.cellSize, this.cellSize);
-    }
-
-    if (cell.pipe) {
-      cell.pipe.drawPipe(ctx, x, y, this.cellSize);
+        ctx.fillStyle = "gray";
+        ctx.fillRect(x, y, this.cellSize, this.cellSize);
+    } else if (cell.pipe) {
+        cell.pipe.drawPipe(ctx, x, y, this.cellSize);
+    } else {
+        this.drawoneCell(ctx, x, y, this.cellSize);
     }
 
     ctx.strokeStyle = "black";

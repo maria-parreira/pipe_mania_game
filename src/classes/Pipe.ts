@@ -1,6 +1,6 @@
 ﻿import { images, startImages, waterImages } from "../configuration/gameConfiguration";
 
-export type PipeType = "horizontal" | "curvedUp" | "curvedDown" | "cross" | "vertical";
+export type PipeType = "horizontal" | "curvedBottomRight" | "curvedBottomDown" | "cross" | "vertical" | "curvedTopRight" | "curvedTopLeft" ;
 
 /**
  * Represents a Pipe in the game.
@@ -20,7 +20,7 @@ export class Pipe {
   }
 
   private getRandomPipeType(): PipeType {
-    const types: PipeType[] = ["horizontal", "curvedUp", "curvedDown", "cross", "vertical"];
+    const types: PipeType[] = ["horizontal", "curvedBottomRight", "curvedBottomDown", "cross", "vertical", "curvedTopRight", "curvedTopLeft"];
     const randomIndex = Math.floor(Math.random() * types.length);
     return types[randomIndex];
   }
@@ -31,10 +31,14 @@ export class Pipe {
         return images.horizontal;
       case "vertical":
         return images.vertical;
-      case "curvedUp":
-        return images.curvedUp;
-      case "curvedDown":
-        return images.curvedDown;
+      case "curvedBottomRight":
+        return images.curvedBottomRight;
+      case "curvedBottomDown":
+        return images.curvedBottomDown;
+      case "curvedTopRight":
+        return images.curvedTopRight;
+      case "curvedTopLeft":
+        return images.curvedTopLeft;
       case "cross":
         return images.cross;
       default:
@@ -49,12 +53,20 @@ export class Pipe {
   }
 
   public drawPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
-    if (this.image.complete) {
+    const draw = () => {
+      ctx.save(); // Salva o estado atual do contexto
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; // Cor da sombra
+      ctx.shadowBlur = 10; // Desfoque da sombra
+      ctx.shadowOffsetX = 5; // Deslocamento da sombra no eixo X
+      ctx.shadowOffsetY = 5; // Deslocamento da sombra no eixo Y
       ctx.drawImage(this.image, x, y, size, size);
+      ctx.restore(); // Restaura o estado do contexto
+    };
+
+    if (this.image.complete) {
+      draw();
     } else {
-      this.image.onload = () => {
-        ctx.drawImage(this.image, x, y, size, size);
-      };
+      this.image.onload = draw;
     }
   }
 
@@ -77,11 +89,17 @@ export class Pipe {
       case "vertical":
         waterImage = waterImages.watervertical;
         break;
-      case "curvedUp":
+      case "curvedBottomRight":
         waterImage = waterImages.watercurvedup;
         break;
-      case "curvedDown":
-        waterImage = waterImages.watercurveddown;
+      case "curvedBottomDown":
+        waterImage = waterImages.watercurvedup;
+        break;
+      case "curvedTopRight":
+        waterImage = waterImages.watercurvedup;
+        break;
+      case "curvedTopLeft":
+        waterImage = waterImages.watercurvedup;
         break;
       case "cross":
         waterImage = waterImages.watercrosshorizontal;
@@ -106,9 +124,9 @@ export class Pipe {
         return ["east", "west"]; // Conecta-se à direita e à esquerda
       case "vertical":
         return ["north", "south"]; // Conecta-se para cima e para baixo
-      case "curvedUp":
+      case "curvedBottomRight":
         return ["north", "east", "west"]; // Curvado para cima
-      case "curvedDown":
+      case "curvedBottomDown":
         return ["south", "east", "west"]; // Curvado para baixo
       case "cross":
         //verificar a peça anterior pra perceber o caminho (se a peça anterior estiver em cima ele so pode ir pra baixa, nao pode curvar 90º)

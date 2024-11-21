@@ -91,7 +91,7 @@ export class Game {
     // Renderiza os elementos do jogo
     this.grid.drawGrid(this.ctx);
     this.grid.drawStartPipeInGrid(this.ctx, 50);
-    this.pipeQueue.drawPipeQueue(this.ctx, 0, 150);
+    this.pipeQueue.drawPipeQueue(this.ctx, 10, 150);
 
     // Renderiza o HUD (incluindo o contador regressivo e pontuação)
     this.drawHUD();

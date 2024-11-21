@@ -12,8 +12,6 @@
 export const images = {
   vertical: new Image(),
   horizontal: new Image(),
-  curvedUp: new Image(),
-  curvedDown: new Image(),
   cross: new Image(),
   startup:new Image(),
   startdown:new Image(),
@@ -26,13 +24,15 @@ export const images = {
   watercurveddown: new Image(),
   waterhorizontal: new Image(),
   watervertical:new Image(),
-
+  curvedBottomRight: new Image(),
+  curvedBottomDown: new Image(),
+  curvedTopRight: new Image(),
+  curvedTopLeft: new Image(),
+  bgcell: new Image(),
 };
 
 images.vertical.src = 'src/assets/pipes/vertical.png';
 images.horizontal.src = 'src/assets/pipes/horizontal.png'
-images.curvedUp.src = 'src/assets/pipes/curvedUp.png';
-images.curvedDown.src = 'src/assets/pipes/curvedDown.png';
 images.cross.src = 'src/assets/pipes/cross.png';
 images.startup.src = 'src/assets/start/startUp.png';
 images.startdown.src = 'src/assets/start/startDown.png';
@@ -45,6 +45,11 @@ images.watercurvedup.src ='src/assets/waterflow/curvedUp.png';
 images.watercurveddown.src = 'src/assets/waterflow/curvedDown.png';
 images.waterhorizontal.src = 'src/assets/waterflow/horizontal.png';
 images.watervertical.src = 'src/assets/waterflow/vertical.png';
+images.curvedBottomRight.src = 'src/assets/pipes/curvedBottomRight.png';
+images.curvedBottomDown.src = 'src/assets/pipes/curvedBottomDown.png';
+images.curvedTopRight.src = 'src/assets/pipes/curvedTopRight.png';
+images.curvedTopLeft.src = 'src/assets/pipes/curvedTopLeft.png';
+images.bgcell.src = 'src/assets/bgcell.png';
 
 
 export const startImages = {

@@ -1,5 +1,4 @@
-﻿
-import { Pipe } from './Pipe'
+﻿import { Pipe } from './Pipe'
 
 /**
  * Represents an individual cell in the grid.
@@ -31,4 +30,6 @@ export class Cell {
     public setPipe(pipe: Pipe): void {
         this.pipe = pipe;
     }
+
+
 }
