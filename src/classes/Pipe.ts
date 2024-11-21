@@ -12,11 +12,13 @@ export class Pipe {
   private image: HTMLImageElement;
   private startImage: HTMLImageElement;
   private type: PipeType;
+  private containsWater: Boolean;
 
   constructor() {
     this.type = this.getRandomPipeType();
     this.image = this.getImageByType(this.type);
     this.startImage = this.getStartImage();
+    this.containsWater = false;
   }
 
   private getRandomPipeType(): PipeType {
@@ -52,7 +54,7 @@ export class Pipe {
     return startImages[startTypes[randomIndex]];
   }
 
-  public drawPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+  public draw(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
     const draw = () => {
       ctx.save(); // Salva o estado atual do contexto
       ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; // Cor da sombra
@@ -74,49 +76,55 @@ export class Pipe {
     ctx.drawImage(this.startImage, x, y, size, size);
   }
 
-  public drawEndPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
-    ctx.drawImage(images.end, x, y, size, size);
-  }
-
   // Método para desenhar o tubo com água
-  public drawPipeWithWater(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
-    let waterImage: HTMLImageElement;
-
+  public drawWaterPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+    let images: HTMLImageElement[];
     switch (this.type) {
       case "horizontal":
-        waterImage = waterImages.waterhorizontal;
+        images = [waterImages.horizontal33, waterImages.horizontal66, waterImages.horizontal100]
+        this.drawFillingPipe(ctx, x, y, size, images);
         break;
       case "vertical":
-        waterImage = waterImages.watervertical;
+        images = [waterImages.vertical33, waterImages.vertical66, waterImages.vertical100]
         break;
       case "curvedBottomRight":
-        waterImage = waterImages.watercurvedup;
+        images = [waterImages.curvedTopBR33, waterImages.curvedTopBR66, waterImages.curvedTopBR100]
+        this.drawFillingPipe(ctx, x, y, size, images);
         break;
       case "curvedBottomDown":
-        waterImage = waterImages.watercurvedup;
+        images = [waterImages.curvedBottomTR33, waterImages.curvedBottomTR66, waterImages.curvedBottomTR100]
+        this.drawFillingPipe(ctx, x, y, size, images);
         break;
       case "curvedTopRight":
-        waterImage = waterImages.watercurvedup;
+        images = [waterImages.curvedTopBL33, waterImages.curvedTopBL66, waterImages.curvedTopBL100]
+        this.drawFillingPipe(ctx, x, y, size, images);
         break;
       case "curvedTopLeft":
-        waterImage = waterImages.watercurvedup;
+        images = [waterImages.curvedTopBL33, waterImages.curvedTopBL66, waterImages.curvedTopBL100]
+        this.drawFillingPipe(ctx, x, y, size, images);
         break;
       case "cross":
-        waterImage = waterImages.watercrosshorizontal;
+        images = [waterImages.cross33H, waterImages.cross66H, waterImages.cross100H]
+        this.drawFillingPipe(ctx, x, y, size, images);
         break;
       default:
         throw new Error("invalid pipe type");
     }
-
-    if (waterImage.complete) {
-      ctx.drawImage(waterImage, x, y, size, size);
-    } else {
-      waterImage.onload = () => {
-        ctx.drawImage(waterImage, x, y, size, size);
-      };
-    }
   }
 
+  private drawFillingPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, images: HTMLImageElement[] ){
+    let fillLevel = 0; // 0: vazio, 1: 33%, 2: 66%, 3: 100%
+
+    const draw = () => {
+      if (fillLevel < images.length) {
+        ctx.drawImage(images[fillLevel], x, y, size, size);
+        fillLevel++;
+        setTimeout(draw, 500); // Espera 500ms antes de desenhar a próxima imagem
+      }
+    };
+
+    draw();
+  }
 
   public getPossibleConnectionsToAdjacentPipes(): string[] {
     switch (this.type) {
@@ -136,8 +144,11 @@ export class Pipe {
     }
   }
 
-
   public getType(): PipeType {
     return this.type;
+  }
+
+  public fillWithWater(){
+    this.containsWater = true;
   }
 }

@@ -12,15 +12,13 @@ export class Cell {
     private size: number;
     private pipe: Pipe | null; 
     private blocked: boolean; 
-    private water: boolean; 
 
-    constructor(row: number, col: number, size:number) {
+    constructor(row: number, col: number, size:number, blocked: boolean) {
         this.row = row;
         this.col = col;
         this.size = size;
         this.pipe = null; 
-        this.blocked = false; 
-        this.water = false; 
+        this.blocked = blocked; 
     }
 
     public getPipe(): Pipe | null {
@@ -31,5 +29,13 @@ export class Cell {
         this.pipe = pipe;
     }
 
+    public isBlocked(): Boolean{
+        return this.blocked;
+    }
+
+    public fillPipeWithWater(ctx: CanvasRenderingContext2D){
+        this.pipe?.fillWithWater();
+        this.pipe?.drawWaterPipe(ctx, this.row, this.col, this.size);
+    }
 
 }

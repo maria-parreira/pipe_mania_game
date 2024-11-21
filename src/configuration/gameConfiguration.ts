@@ -9,62 +9,115 @@
 };
 
 
-export const images = {
-  vertical: new Image(),
-  horizontal: new Image(),
-  cross: new Image(),
-  startup:new Image(),
-  startdown:new Image(),
-  startleft:new Image(),
-  startright:new Image(),
-  end: new Image(),
-  watercrosshorizontal: new Image(),
-  watercrossvertical:new Image(),
-  watercurvedup:new Image(),
-  watercurveddown: new Image(),
-  waterhorizontal: new Image(),
-  watervertical:new Image(),
-  curvedBottomRight: new Image(),
-  curvedBottomDown: new Image(),
-  curvedTopRight: new Image(),
-  curvedTopLeft: new Image(),
-  bgcell: new Image(),
+// Função para carregar imagens automaticamente
+const loadImages = (imagePaths: { [key: string]: string }) => {
+  const images: { [key: string]: HTMLImageElement } = {};
+  for (const [key, path] of Object.entries(imagePaths)) {
+    const img = new Image();
+    img.src = path;
+    images[key] = img;
+  }
+  return images;
 };
 
-images.vertical.src = 'src/assets/pipes/vertical.png';
-images.horizontal.src = 'src/assets/pipes/horizontal.png'
-images.cross.src = 'src/assets/pipes/cross.png';
-images.startup.src = 'src/assets/start/startUp.png';
-images.startdown.src = 'src/assets/start/startDown.png';
-images.startleft.src = 'src/assets/start/startLeft.png';
-images.startright.src = 'src/assets/start/startRight.png';
-images.end.src = 'src/assets/end/end.png';
-images.watercrosshorizontal.src = 'src/assets/waterflow/crossHorizontal.png';
-images.watercrossvertical.src = 'src/assets/waterflow/crossVertical.png';
-images.watercurvedup.src ='src/assets/waterflow/curvedUp.png';
-images.watercurveddown.src = 'src/assets/waterflow/curvedDown.png';
-images.waterhorizontal.src = 'src/assets/waterflow/horizontal.png';
-images.watervertical.src = 'src/assets/waterflow/vertical.png';
-images.curvedBottomRight.src = 'src/assets/pipes/curvedBottomRight.png';
-images.curvedBottomDown.src = 'src/assets/pipes/curvedBottomDown.png';
-images.curvedTopRight.src = 'src/assets/pipes/curvedTopRight.png';
-images.curvedTopLeft.src = 'src/assets/pipes/curvedTopLeft.png';
-images.bgcell.src = 'src/assets/bgcell.png';
-
-
-export const startImages = {
-  startup: images.startup,
-  startdown: images.startdown,
-  startleft: images.startleft,
-  startright: images.startright,
+// Defina os caminhos das suas imagens em um objeto
+const imagePaths: { [key: string]: string } = {
+  vertical: 'src/assets/pipes/vertical.png',
+  horizontal: 'src/assets/pipes/horizontal.png',
+  cross: 'src/assets/pipes/cross.png',
+  curvedBottomRight: 'src/assets/pipes/curvedBottomRight.png',
+  curvedBottomDown: 'src/assets/pipes/curvedBottomDown.png',
+  curvedTopRight: 'src/assets/pipes/curvedTopRight.png',
+  curvedTopLeft: 'src/assets/pipes/curvedTopLeft.png',
+  bgcell: 'src/assets/bgcell.png',
+  curvedTopBL66e: 'src/assets/waterflow/curvedTop/BL/66e.png',
+  vertical100: 'src/assets/waterflow/vertical/100.png',
+  vertical66c: 'src/assets/waterflow/vertical/66c.png',
+  vertical66b: 'src/assets/waterflow/vertical/66b.png',
+  vertical33c: 'src/assets/waterflow/vertical/33c.png',
+  horizontal100: 'src/assets/waterflow/horizontal/100.png',
+  horizontal66e: 'src/assets/waterflow/horizontal/66e.png',
+  horizontal66d: 'src/assets/waterflow/horizontal/66d.png',
+  vertical33b: 'src/assets/waterflow/vertical/33b.png',
+  horizontal33e: 'src/assets/waterflow/horizontal/33e.png',
+  horizontal33d: 'src/assets/waterflow/horizontal/33d.png',
+  curvedTopBR100: 'src/assets/waterflow/curvedTop/BR/100.png',
+  curvedTopBR66d: 'src/assets/waterflow/curvedTop/BR/66d.png',
+  curvedTopBR66b: 'src/assets/waterflow/curvedTop/BR/66b.png',
+  curvedTopBR33d: 'src/assets/waterflow/curvedTop/BR/33d.png',
+  curvedTopBR33b: 'src/assets/waterflow/curvedTop/BR/33b.png',
+  curvedTopBL100: 'src/assets/waterflow/curvedTop/BL/100.png',
+  curvedTopBL66b: 'src/assets/waterflow/curvedTop/BL/66b.png',
+  curvedTopBL33e: 'src/assets/waterflow/curvedTop/BL/33e.png',
+  curvedTopBL33b: 'src/assets/waterflow/curvedTop/BL/33b.png',
+  curvedBottomTL100: 'src/assets/waterflow/curvedBottom/TL/100.png',
+  curvedBottomTL66e: 'src/assets/waterflow/curvedBottom/TL/66e.png',
+  curvedBottomTL66c: 'src/assets/waterflow/curvedBottom/TL/66c.png',
+  curvedBottomTL33e: 'src/assets/waterflow/curvedBottom/TL/33e.png',
+  curvedBottomTL33c: 'src/assets/waterflow/curvedBottom/TL/33c.png',
+  curvedBottomTL: 'src/assets/waterflow/curvedBottom/TL',
+  curvedBottom: 'src/assets/waterflow/curvedBottom',
+  cross100V: 'src/assets/waterflow/cross/100V.png',
+  cross66e: 'src/assets/waterflow/cross/66e.png',
+  cross100H: 'src/assets/waterflow/cross/100H.png',
+  cross33e: 'src/assets/waterflow/cross/33e.png',
+  cross33d: 'src/assets/waterflow/cross/33d.png',
+  curvedBottomTR33c: 'src/assets/waterflow/curvedBottom/TR/33c.png',
+  curvedBottomTR33d: 'src/assets/waterflow/curvedBottom/TR/33d.png',
+  curvedBottomTR66c: 'src/assets/waterflow/curvedBottom/TR/66c.png',
+  curvedBottomTR66d: 'src/assets/waterflow/curvedBottom/TR/66d.png',
+  curvedBottomTR100: 'src/assets/waterflow/curvedBottom/TR/100.png',
 };
 
-export const waterImages = {
-  watercrosshorizontal: images.watercrosshorizontal,
-  watercrossvertical: images.watercrossvertical,
-  watercurvedup:images.watercurvedup,
-  watercurveddown: images.watercurveddown,
-  waterhorizontal: images.waterhorizontal,
-  watervertical: images.watervertical,
-}
+// Carregar imagens de água
+export const waterImages = loadImages({
+  curvedTopBL66e: 'src/assets/waterflow/curvedTop/BL/66e.png',
+  vertical100: 'src/assets/waterflow/vertical/100.png',
+  vertical66c: 'src/assets/waterflow/vertical/66c.png',
+  vertical66b: 'src/assets/waterflow/vertical/66b.png',
+  vertical33c: 'src/assets/waterflow/vertical/33c.png',
+  horizontal100: 'src/assets/waterflow/horizontal/100.png',
+  horizontal66e: 'src/assets/waterflow/horizontal/66e.png',
+  horizontal66d: 'src/assets/waterflow/horizontal/66d.png',
+  vertical33b: 'src/assets/waterflow/vertical/33b.png',
+  horizontal33e: 'src/assets/waterflow/horizontal/33e.png',
+  horizontal33d: 'src/assets/waterflow/horizontal/33d.png',
+  curvedTopBR100: 'src/assets/waterflow/curvedTop/BR/100.png',
+  curvedTopBR66d: 'src/assets/waterflow/curvedTop/BR/66d.png',
+  curvedTopBR66b: 'src/assets/waterflow/curvedTop/BR/66b.png',
+  curvedTopBR33d: 'src/assets/waterflow/curvedTop/BR/33d.png',
+  curvedTopBR33b: 'src/assets/waterflow/curvedTop/BR/33b.png',
+  curvedTopBL100: 'src/assets/waterflow/curvedTop/BL/100.png',
+  curvedTopBL66b: 'src/assets/waterflow/curvedTop/BL/66b.png',
+  curvedTopBL33e: 'src/assets/waterflow/curvedTop/BL/33e.png',
+  curvedTopBL33b: 'src/assets/waterflow/curvedTop/BL/33b.png',
+  curvedBottomTL100: 'src/assets/waterflow/curvedBottom/TL/100.png',
+  curvedBottomTL66e: 'src/assets/waterflow/curvedBottom/TL/66e.png',
+  curvedBottomTL66c: 'src/assets/waterflow/curvedBottom/TL/66c.png',
+  curvedBottomTL33e: 'src/assets/waterflow/curvedBottom/TL/33e.png',
+  curvedBottomTL33c: 'src/assets/waterflow/curvedBottom/TL/33c.png',
+  curvedBottomTL: 'src/assets/waterflow/curvedBottom/TL',
+  curvedBottom: 'src/assets/waterflow/curvedBottom',
+  cross100V: 'src/assets/waterflow/cross/100V.png',
+  cross66e: 'src/assets/waterflow/cross/66e.png',
+  cross100H: 'src/assets/waterflow/cross/100H.png',
+  cross33e: 'src/assets/waterflow/cross/33e.png',
+  cross33d: 'src/assets/waterflow/cross/33d.png',
+  curvedBottomTR33c: 'src/assets/waterflow/curvedBottom/TR/33c.png',
+  curvedBottomTR33d: 'src/assets/waterflow/curvedBottom/TR/33d.png',
+  curvedBottomTR66c: 'src/assets/waterflow/curvedBottom/TR/66c.png',
+  curvedBottomTR66d: 'src/assets/waterflow/curvedBottom/TR/66d.png',
+  curvedBottomTR100: 'src/assets/waterflow/curvedBottom/TR/100.png',
+});
 
+// Carregue todas as imagens
+export const images = loadImages(imagePaths);
+
+
+// Carregue imagens de início separadamente
+export const startImages = loadImages({
+  startup: 'src/assets/start/startUp.png',
+  startdown: 'src/assets/start/startDown.png',
+  startleft: 'src/assets/start/startLeft.png',
+  startright: 'src/assets/start/startRight.png',
+});

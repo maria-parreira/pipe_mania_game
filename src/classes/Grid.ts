@@ -1,4 +1,5 @@
 ﻿import { images } from "../configuration/gameConfiguration";
+import { Cell } from "./Cell";
 import { Pipe } from './Pipe';
 
 /**
@@ -12,7 +13,7 @@ export class Grid {
   private rows: number;
   private cols: number;
   private cellSize: number;
-  private cells: { pipe: Pipe | null; blocked: boolean; water: boolean }[][];
+  private cells: Cell[][];
   private startPipePosition: { x: number; y: number } | null = null;
   private startPipe: Pipe | null = null;
   private image: HTMLImageElement = images.bgcell;
@@ -21,7 +22,7 @@ export class Grid {
     this.rows = rows;
     this.cols = cols;
     this.cellSize = cellSize;
-    this.cells = [];
+    this.cells = [[],[]];
     this.initializeGrid();
   }
 
@@ -42,18 +43,14 @@ export class Grid {
     return blockedIndices;
   }
 
-  private createGrid(blockedIndices: Set<number>): { pipe: Pipe | null; blocked: boolean; water: boolean }[][] {
-    const grid: { pipe: Pipe | null; blocked: boolean; water: boolean }[][] = [];
+  private createGrid(blockedIndices: Set<number>): Cell[][] {
+    const grid: Cell[][] = [[],[]];
     for (let row = 0; row < this.rows; row++) {
-      const gridRow: { pipe: Pipe | null; blocked: boolean; water: boolean }[] = [];
+      const gridRow: Cell[] = [];
       for (let col = 0; col < this.cols; col++) {
         const index = row * this.cols + col;
         const isBlocked = blockedIndices.has(index); 
-        gridRow.push({
-          pipe: null,
-          blocked: isBlocked,
-          water: false,
-        });
+        gridRow.push(new Cell(row, col, this.cellSize, isBlocked));
       }
       grid.push(gridRow);
     }
@@ -76,13 +73,11 @@ export class Grid {
     return (ctx.canvas.height - (this.rows * this.cellSize)) / 2;
   }
 
-  public setCellPipe(row: number, col: number, newPipe: Pipe): boolean {
+  public setCellPipe(row: number, col: number, newPipe: Pipe): void {
     const cell = this.cells[row][col];
-    if (cell.blocked) {
-      return false;
+    if (!cell.isBlocked()) {
+      cell.setPipe(newPipe);
     }
-    cell.pipe = newPipe;
-    return true;
   }
 
   public drawGrid(ctx: CanvasRenderingContext2D) {
@@ -110,11 +105,11 @@ export class Grid {
     const cell = this.cells[row][col];
     const { x, y } = this.getCellPosition(row, col, ctx);
 
-    if (cell.blocked) {
+    if (cell?.isBlocked()) {
         ctx.fillStyle = "gray";
         ctx.fillRect(x, y, this.cellSize, this.cellSize);
-    } else if (cell.pipe) {
-        cell.pipe.drawPipe(ctx, x, y, this.cellSize);
+    } else if (cell?.getPipe()) {
+        cell.getPipe()?.draw(ctx, x, y, this.cellSize);
     } else {
         this.drawoneCell(ctx, x, y, this.cellSize);
     }
@@ -165,7 +160,7 @@ private areStartPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: 
     if (randomRow === this.rows - 1) {
         return false;
     }
-    if (this.cells[randomRow][randomCol].blocked) {
+    if (this.cells[randomRow][randomCol].isBlocked()) {
         return false;
     }
     const neighbors = this.getNeighboringCells(randomRow, randomCol);
@@ -218,17 +213,16 @@ private getNeighboringCells(row: number, col: number): { row: number; col: numbe
         .filter(({ row, col }) => this.isValidCell(row, col)); 
 }
 
-private isValidCell(row: number, col: number): boolean {
+private isValidCell(row: number, col: number): Boolean {
     return row >= 0 && row < this.rows && col >= 0 && col < this.cols;
 }
 
-private isCellBlocked(row: number, col: number): boolean {
+private isCellBlocked(row: number, col: number): Boolean {
     if (!this.isValidCell(row, col)) {
         return true;
     }
-    return this.cells[row][col].blocked;
+    return this.cells[row][col].isBlocked();
 }
-
 
   private generateRandomPipePosition(){
     const rows = this.cells.length;
@@ -240,12 +234,24 @@ private isCellBlocked(row: number, col: number): boolean {
     return {randomRow, randomCol};
   }
 
+
+  // Função para atualizar o estado da célula adjacente e desenhar o water pipe
+  private updateAdjacentCellWithWater(ctx:CanvasRenderingContext2D, row: number, col: number): void {
+    const adjacentCoordinates = this.hasAdjacentConnections(row, col);
+    if (adjacentCoordinates) {
+      const { row: adjRow, col: adjCol } = adjacentCoordinates;
+      const adjacentCell = this.cells[adjRow][adjCol];
+
+      adjacentCell.fillPipeWithWater(ctx);
+    }
+  }
+
   // recebe a col e row da celula atual e vai buscar o pipe;
   // verifica se o pipe tem conexoes com outros ao lado
   // se a resposta anterior for true, com base na col e row da celula atual 
   // devolve a row e col da celula para onde vai a seguir com a qual tem ligação
-  public hasAdjacentConnections(row: number, col: number):{ row: number; col: number } | null {
-    const currentPipe = this.cells[row][col].pipe
+  private hasAdjacentConnections(row: number, col: number):{ row: number; col: number } | null {
+    const currentPipe = this.cells[row][col].getPipe();
     const possibleConnections = currentPipe?.getPossibleConnectionsToAdjacentPipes() || [];
 
     for (const direction of possibleConnections) {
@@ -253,7 +259,7 @@ private isCellBlocked(row: number, col: number): boolean {
       if (adjacentCellPipe) {
         const [adjRow, adjCol] = adjacentCellPipe;
         const adjacentPipe = this.cells[adjRow][adjCol];
-        if (adjacentPipe && adjacentPipe.pipe) {
+        if (adjacentPipe && adjacentPipe.getPipe()) {
           return { row: adjacentCellPipe[0], col: adjacentCellPipe[1] }; 
         }
       }

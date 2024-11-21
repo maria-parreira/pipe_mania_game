@@ -46,7 +46,7 @@ export class PipeQueue {
 
     this.queue.getItems().forEach((pipe, index) => {
       const pipeY = y + index * (pipeSize + pipeSpacing);
-      pipe.drawPipe(ctx, x, pipeY, pipeSize);
+      pipe.draw(ctx, x, pipeY, pipeSize);
     });
   }
   public generatePipe(): Pipe {
