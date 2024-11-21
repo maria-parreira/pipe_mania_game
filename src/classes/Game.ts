@@ -50,6 +50,7 @@ export class Game {
         this.countdown--; // Diminui o contador
       } else {
         this.stopCountdown(); // Para o temporizador quando chega a 0
+        this.startWaterFlow(); // Inicia o fluxo de água quando o contador chega a 0
       }
     }, 1000); // Intervalo de 1 segundo
   }
@@ -59,6 +60,11 @@ export class Game {
       clearInterval(this.timerInterval); // Para o intervalo
       this.timerInterval = null;
     }
+  }
+
+  private startWaterFlow() {
+    // A partir deste momento, a água começa a fluir
+    this.grid.startWaterFlow(); // Método na Grid para iniciar o fluxo de água
   }
 
   private runGameLoop() {
@@ -74,6 +80,10 @@ export class Game {
 
   private updateGame() {
     // Atualizações gerais do jogo podem ser adicionadas aqui
+    if (this.countdown === 0) {
+      // Quando o tempo chega a zero, o fluxo de água pode ser atualizado
+      this.grid.updateWaterFlow(); // Método que simula o fluxo de água
+    }
   }
 
   private drawGame() {
@@ -134,5 +144,3 @@ export class Game {
     }
   }
 }
-
-

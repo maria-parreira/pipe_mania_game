@@ -15,8 +15,6 @@ export class Grid {
   private cells: { pipe: Pipe | null; blocked: boolean; water: boolean }[][];
   private startPipePosition: { x: number; y: number } | null = null;
   private startPipe: Pipe | null = null;
-  private endPipePosition: { x: number; y: number } | null = null;
-  private endPipe: Pipe | null = null;
 
   constructor(rows: number, cols: number, cellSize: number) {
     this.rows = rows;
@@ -152,26 +150,18 @@ export class Grid {
 }
 
 private areStartPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: CanvasRenderingContext2D): boolean {
-    // Verifica se a célula está na última linha (não pode ser na última linha)
     if (randomRow === this.rows - 1) {
         return false;
     }
-
-    // Verifica se a célula é válida (não bloqueada)
     if (this.cells[randomRow][randomCol].blocked) {
         return false;
     }
-
-    // Verifica se as células vizinhas estão bloqueadas
     const neighbors = this.getNeighboringCells(randomRow, randomCol);
     for (const { row, col } of neighbors) {
         if (this.isCellBlocked(row, col)) {
-            // Se uma célula vizinha está bloqueada, tenta mover a start pipe
             return this.tryMoveStartPipe(randomRow, randomCol, ctx);
         }
     }
-
-    // Define a posição da start pipe no grid
     const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
     const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY);
     this.startPipePosition = { x, y };
@@ -179,12 +169,11 @@ private areStartPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: 
 }
 
 private tryMoveStartPipe(row: number, col: number, ctx: CanvasRenderingContext2D): boolean {
-    // Tenta deslocar a start pipe para as células vizinhas, com mais controle sobre a distância
     const directions = [
-        { row: row - 1, col },  // Acima
-        { row: row + 1, col },  // Abaixo
-        { row, col: col - 1 },  // Esquerda
-        { row, col: col + 1 },  // Direita
+        { row: row - 1, col },  
+        { row: row + 1, col },  
+        { row, col: col - 1 },  
+        { row, col: col + 1 }, 
     ];
 
     for (const { row: newRow, col: newCol } of directions) {
@@ -201,20 +190,20 @@ private tryMoveStartPipe(row: number, col: number, ctx: CanvasRenderingContext2D
             }
         }
     }
-    return false; // Se não encontrar uma posição válida, retorna false
+    return false;
 }
 
 private getNeighboringCells(row: number, col: number): { row: number; col: number }[] {
     const directions = [
-        { row: -1, col: 0 }, // Acima
-        { row: 1, col: 0 },  // Abaixo
-        { row: 0, col: -1 }, // Esquerda
-        { row: 0, col: 1 }   // Direita
+        { row: -1, col: 0 }, 
+        { row: 1, col: 0 }, 
+        { row: 0, col: -1 }, 
+        { row: 0, col: 1 }   
     ];
 
     return directions
         .map(({ row: dRow, col: dCol }) => ({ row: row + dRow, col: col + dCol }))
-        .filter(({ row, col }) => this.isValidCell(row, col)); // Apenas células dentro do grid
+        .filter(({ row, col }) => this.isValidCell(row, col)); 
 }
 
 private isValidCell(row: number, col: number): boolean {
@@ -223,7 +212,7 @@ private isValidCell(row: number, col: number): boolean {
 
 private isCellBlocked(row: number, col: number): boolean {
     if (!this.isValidCell(row, col)) {
-        return true; // Fora do grid é considerado bloqueado
+        return true;
     }
     return this.cells[row][col].blocked;
 }
@@ -239,55 +228,42 @@ private isCellBlocked(row: number, col: number): boolean {
     return {randomRow, randomCol};
   }
 
+
+  public hasAdjacentConnections(row: number, col: number): boolean {
+    const currentPipe = this.cells[row][col].pipe
+    const possibleConnections = currentPipe?.getPossibleConnectionsToAdjacentPipes() || [];
+
+    for (const direction of possibleConnections) {
+      const adjacentCellPipe = this.getAdjacentCellPipe(row, col, direction);
+      if (adjacentCellPipe) {
+        const [adjRow, adjCol] = adjacentCellPipe;
+        const adjacentPipe = this.cells[adjRow][adjCol];
+        if (adjacentPipe && adjacentPipe.pipe) {
+          return true; // Há um tubo adjacente para se conectar
+        }
+      }
+    }
+    return false; // Nenhum tubo adjacente encontrado
+  }
   
-/*
-  public drawEndPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
-    if (!this.endPipePosition) {
-      let cellFound = false;
-      
-      while (!cellFound) {
-          const {randomRow, randomCol } = this.generateRandomPipePosition();
-
-          if(this.areEndPipeCoordinatesValid(randomRow, randomCol, ctx)){
-            cellFound = true ;
-          }
-      }
-
-      if (!this.endPipe) {
-        this.endPipe = new Pipe();
+    // Retorna as coordenadas da célula adjacente na direção dada
+    private getAdjacentCellPipe(row: number, col: number, direction: string): [number, number] | null {
+      switch (direction) {
+        case "north":
+          return row > 0 ? [row - 1, col] : null;
+        case "south":
+          return row < this.cells.length - 1 ? [row + 1, col] : null;
+        case "east":
+          return col < this.cells[0].length - 1 ? [row, col + 1] : null;
+        case "west":
+          return col > 0 ? [row, col - 1] : null;
+        default:
+          return null;
       }
     }
 
-    const { x, y } = this.endPipePosition!;
-    this.endPipe?.drawEndPipe(ctx, x, y, cellSize); 
-  }
 
 
-  private areEndPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: CanvasRenderingContext2D){
-    const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
-
-    if (!this.cells[randomRow][randomCol].blocked && randomRow < this.cells.length - 1) {
-      if(!this.isValidDistanceFromEndToStartPipes(randomRow, randomCol)){
-        return false;
-      }
-      const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY);
-      this.endPipePosition = { x, y }; 
-      return true;
-    }
-    return false;
-  }
-
-  private isValidDistanceFromEndToStartPipes(randomRow: number, randomCol: number){
-    if (this.startPipePosition) {
-      const startRow = Math.floor(this.startPipePosition.y / this.cellSize);
-      const startCol = Math.floor(this.startPipePosition.x / this.cellSize);
-      if (Math.abs(randomRow - startRow) < 3 && Math.abs(randomCol - startCol) < 3) {
-        return false;
-      }
-    }
-    return true;
-  }
-    */
 
 }
 
