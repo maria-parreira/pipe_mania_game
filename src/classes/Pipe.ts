@@ -111,6 +111,7 @@ export class Pipe {
       case "curvedDown":
         return ["south", "east", "west"]; // Curvado para baixo
       case "cross":
+        //verificar a peça anterior pra perceber o caminho (se a peça anterior estiver em cima ele so pode ir pra baixa, nao pode curvar 90º)
         return ["north", "south", "east", "west"]; // Cross conecta em todas as direções
       default:
         return []; // Tipo de tubo inválido

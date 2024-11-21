@@ -228,8 +228,11 @@ private isCellBlocked(row: number, col: number): boolean {
     return {randomRow, randomCol};
   }
 
-
-  public hasAdjacentConnections(row: number, col: number): boolean {
+  // recebe a col e row da celula atual e vai buscar o pipe;
+  // verifica se o pipe tem conexoes com outros ao lado
+  // se a resposta anterior for true, com base na col e row da celula atual 
+  // devolve a row e col da celula para onde vai a seguir com a qual tem ligação
+  public hasAdjacentConnections(row: number, col: number):{ row: number; col: number } | null {
     const currentPipe = this.cells[row][col].pipe
     const possibleConnections = currentPipe?.getPossibleConnectionsToAdjacentPipes() || [];
 
@@ -239,11 +242,11 @@ private isCellBlocked(row: number, col: number): boolean {
         const [adjRow, adjCol] = adjacentCellPipe;
         const adjacentPipe = this.cells[adjRow][adjCol];
         if (adjacentPipe && adjacentPipe.pipe) {
-          return true; // Há um tubo adjacente para se conectar
+          return { row: adjacentCellPipe[0], col: adjacentCellPipe[1] }; 
         }
       }
     }
-    return false; // Nenhum tubo adjacente encontrado
+    return null; // Nenhum tubo adjacente encontrado
   }
   
     // Retorna as coordenadas da célula adjacente na direção dada
@@ -261,7 +264,6 @@ private isCellBlocked(row: number, col: number): boolean {
           return null;
       }
     }
-
 
 
 

@@ -64,7 +64,6 @@ export class Game {
 
   private startWaterFlow() {
     // A partir deste momento, a água começa a fluir
-    this.grid.startWaterFlow(); // Método na Grid para iniciar o fluxo de água
   }
 
   private runGameLoop() {
@@ -82,7 +81,7 @@ export class Game {
     // Atualizações gerais do jogo podem ser adicionadas aqui
     if (this.countdown === 0) {
       // Quando o tempo chega a zero, o fluxo de água pode ser atualizado
-      this.grid.updateWaterFlow(); // Método que simula o fluxo de água
+      
     }
   }
 
