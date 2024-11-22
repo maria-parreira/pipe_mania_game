@@ -72,8 +72,11 @@ export class Game {
     if (startPipeCoordinates) {
         const { row, col } = startPipeCoordinates;
         this.waterFlow?.flowWaterFromCell(row, col);
+        
+        // Inspecionar células ao redor
+        this.inspectSurroundingCells(row, col);
     }
-}
+  }
 
 
   private runGameLoop() {
@@ -115,6 +118,49 @@ export class Game {
   }
 
 
+  private inspectSurroundingCells(row: number, col: number) {
+    const currentCell = this.grid.getGridCell(row, col);
+    const currentPipe = currentCell.getPipe();
+
+    if (currentPipe) {
+      const possibleDirections = currentPipe.getPossibleConnectionsToAdjacentPipes(); // Obtém as direções possíveis do pipe atual
+
+      possibleDirections.forEach(direction => {
+        let newRow = row;
+        let newCol = col;
+
+        // Atualiza as coordenadas com base na direção
+        switch (direction) {
+          case 'north':
+            newRow -= 1;
+            break;
+          case 'south':
+            newRow += 1;
+            break;
+          case 'west':
+            newCol -= 1;
+            break;
+          case 'east':
+            newCol += 1;
+            break;
+        }
+
+        if (this.grid.isValidCell(newRow, newCol)) {
+          const adjacentCell = this.grid.getGridCell(newRow, newCol);
+          const adjacentPipe = adjacentCell.getPipe();
+
+          if (adjacentPipe) {
+            const adjacentPossibleDirections = adjacentPipe.getPossibleConnectionsToAdjacentPipes();
+            if (adjacentPossibleDirections.includes(direction)) {
+              console.log(`Célula adjacente com pipe alinhado encontrada em: (${newRow}, ${newCol})`);
+            }
+          }
+        }
+      });
+    }
+  }
+
+
   private addEventListeners() {
     this.canvas.addEventListener("click", this.handleGridClick.bind(this));
   }
@@ -146,4 +192,8 @@ export class Game {
       this.pipeQueue.addLast(newPipe);
     }
   }
+
+
+
+
 }
