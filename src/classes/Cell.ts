@@ -4,14 +4,13 @@
  * Represents an individual cell in the grid.
  * Each cell can contain a pipe, be blocked, or contain water.
  */
-
-
 export class Cell {
     private row: number; 
     private col: number; 
     private size: number;
     private pipe: Pipe | null; 
-    private blocked: boolean; 
+    private blocked: boolean;
+    private startPipe: Pipe | null = null;
 
     constructor(row: number, col: number, size:number, blocked: boolean) {
         this.row = row;
@@ -41,5 +40,14 @@ export class Cell {
         this.pipe?.fillWithWater();
         this.pipe?.drawWaterPipe(ctx, this.row, this.col, this.size);
     }
+
+    public getRow():number {
+        return this.row;
+    }
+
+    public getCol():number {
+        return this.col;
+    }
+
 
 }

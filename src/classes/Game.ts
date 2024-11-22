@@ -63,9 +63,10 @@ export class Game {
   }
 
   private startWaterFlow(ctx:CanvasRenderingContext2D) {
-    const row = this.grid.getCellStartPipeCoordinates(this.ctx)?.row ?? 0;
-    const col = this.grid.getCellStartPipeCoordinates(this.ctx)?.col ?? 0;
-    this.grid.updateAdjacentCellWithWater(this.ctx, row, col);
+    const cellWithStartPipePosition = this.grid.getCellStartPipeCoordinates()
+    const row = cellWithStartPipePosition?.row
+    const col = cellWithStartPipePosition?.col
+    
   }
 
   private runGameLoop() {
@@ -89,7 +90,7 @@ export class Game {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.grid.draw(this.ctx);
-    this.grid.drawStartPipeInGrid(this.ctx, 50);
+    this.grid.drawStartPipe(this.ctx, 50);
     this.pipeQueue.drawPipeQueue(this.ctx, 10, 150);
 
     this.drawHUD();

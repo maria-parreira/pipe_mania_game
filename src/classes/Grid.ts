@@ -14,7 +14,7 @@ export class Grid {
   private cols: number;
   private cellSize: number;
   private cells: Cell[][];
-  private startPipePosition: { x: number; y: number } | null = null;
+  private cellWithStartPipe: { x: number; y: number } | null = null;
   private startPipe: Pipe | null = null;
   private image: HTMLImageElement = images.bgcell;
 
@@ -106,12 +106,12 @@ export class Grid {
 
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
-        this.drawGridCell(ctx, row, col);
+        this.drawCellWithImages(ctx, row, col);
       }
     }
   }
 
-  private drawGridCell(ctx: CanvasRenderingContext2D, row: number, col: number) {
+  private drawCellWithImages(ctx: CanvasRenderingContext2D, row: number, col: number) {
     const cell = this.cells[row][col];
     const { x, y } = this.getCellPosition(row, col, ctx);
 
@@ -138,33 +138,40 @@ export class Grid {
       }
   }
 
-  public drawStartPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
-    if (!this.startPipePosition) {
-        let cellFound = false;
+  public drawStartPipe(ctx: CanvasRenderingContext2D, cellSize: number) {
+    if (!this.cellWithStartPipe) {
+        this.initializeStartPipe(ctx);
+    }
 
-        while (!cellFound) {
-            const { randomRow, randomCol } = this.generateRandomPipePosition();
+    const { x, y } = this.cellWithStartPipe!;
+    this.startPipe?.drawStartPipe(ctx, x, y, cellSize);
+    
+    this.blockCellAtStartPipeCoordinates(ctx);
+  }
 
-            if (this.areStartPipeCoordinatesValid(randomRow, randomCol, ctx)) {
-                cellFound = true;
-            }
-        }
+  private initializeStartPipe(ctx: CanvasRenderingContext2D) {
+    let cellFound = false;
 
-        if (!this.startPipe) {
-            this.startPipe = new Pipe();
+    while (!cellFound) {
+        const { randomRow, randomCol } = this.generateRandomPipePosition();
+        this.cellWithStartPipe = { x: randomCol, y: randomRow }; 
+        if (this.areStartPipeCoordinatesValid(randomRow, randomCol, ctx)) {
+            cellFound = true;
         }
     }
 
-    const { x, y } = this.startPipePosition!;
-    this.startPipe?.drawStartPipe(ctx, x, y, cellSize);
-    
+    if (!this.startPipe) {
+        this.startPipe = new Pipe();
+    }
+  }
+
+  private blockCellAtStartPipeCoordinates(ctx: CanvasRenderingContext2D) {
     const startPipeCoordinates = this.getCellStartPipeCoordinates(ctx);
     if (startPipeCoordinates) {
         const { row, col } = startPipeCoordinates;
         this.cells[row][col].setBlocked(true);
     }
 }
-
 private areStartPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: CanvasRenderingContext2D): boolean {
     if (randomRow === this.rows - 1) {
         return false;
@@ -180,7 +187,7 @@ private areStartPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: 
     }
     const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
     const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY);
-    this.startPipePosition = { x, y };
+    this.cellWithStartPipe = { x, y };
     return true;
 }
 
@@ -200,7 +207,7 @@ private tryMoveStartPipe(row: number, col: number, ctx: CanvasRenderingContext2D
             if (isValidPosition) {
                 const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
                 const { x, y } = this.getGridCoordinate(newRow, newCol, borderIntervalX, borderIntervalY);
-                this.startPipePosition = { x, y };
+                this.cellWithStartPipe = { x, y };
                 return true;
             }
         }
@@ -291,14 +298,16 @@ private isCellBlocked(row: number, col: number): Boolean {
   }
 
   public getCellStartPipeCoordinates(ctx:CanvasRenderingContext2D): { row: number; col: number } | null {
-    if (this.startPipePosition) {
-        const { x, y } = this.startPipePosition;
+    if (this.cellWithStartPipe) {
+        const { x, y } = this.cellWithStartPipe;
         const col = Math.floor((x - this.getBorderIntervalX(ctx)) / this.cellSize);
         const row = Math.floor((y - this.getBorderIntervalY(ctx)) / this.cellSize);
         return { row, col };
     }
     return null; 
-}
+  }
+
+  
 
 
 }

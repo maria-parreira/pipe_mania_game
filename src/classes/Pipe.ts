@@ -2,6 +2,8 @@
 
 export type PipeType = "horizontal" | "curvedBottomRight" | "curvedBottomLeft" | "cross" | "vertical" | "curvedTopRight" | "curvedTopLeft" ;
 
+export type StartPipe = "Left" | "Right" | "Up" | "Down";
+
 /**
  * Represents a Pipe in the game.
  * This class handles the pipe's images, random type selection,
@@ -76,6 +78,19 @@ export class Pipe {
     ctx.drawImage(this.startImage, x, y, size, size);
   }
 
+  public getStartPipeOrientation(StartPipe: StartPipe): String {
+    if (images.startup) {
+        return "Up";
+    } else if (images.startdown) {
+        return "Down";
+    } else if (images.startleft) {
+        return "Left";
+    } else if (images.startright) {
+        return "Right";
+    } else {
+        return "invalid pipe type";
+    }
+}
 
   public drawWaterPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
     let images: HTMLImageElement[];
