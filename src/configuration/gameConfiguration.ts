@@ -9,7 +9,6 @@
 };
 
 
-// Função para carregar imagens automaticamente
 const loadImages = (imagePaths: { [key: string]: string }) => {
   const images: { [key: string]: HTMLImageElement } = {};
   for (const [key, path] of Object.entries(imagePaths)) {
@@ -20,7 +19,6 @@ const loadImages = (imagePaths: { [key: string]: string }) => {
   return images;
 };
 
-// Defina os caminhos das suas imagens em um objeto
 const imagePaths: { [key: string]: string } = {
   vertical: 'src/assets/pipes/vertical.png',
   horizontal: 'src/assets/pipes/horizontal.png',
@@ -67,6 +65,7 @@ const imagePaths: { [key: string]: string } = {
   curvedBottomTR66c: 'src/assets/waterflow/curvedBottom/TR/66c.png',
   curvedBottomTR66d: 'src/assets/waterflow/curvedBottom/TR/66d.png',
   curvedBottomTR100: 'src/assets/waterflow/curvedBottom/TR/100.png',
+  blockedcell:'src/assets/blockedcell.png',
 };
 
 // Carregar imagens de água

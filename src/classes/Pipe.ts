@@ -57,13 +57,12 @@ export class Pipe {
 
   public draw(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
     const draw = () => {
-      ctx.save(); // Salva o estado atual do contexto
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; // Cor da sombra
-      ctx.shadowBlur = 10; // Desfoque da sombra
-      ctx.shadowOffsetX = 5; // Deslocamento da sombra no eixo X
-      ctx.shadowOffsetY = 5; // Deslocamento da sombra no eixo Y
+      ctx.save(); 
+      ctx.strokeStyle = 'blue'; 
+      ctx.lineWidth = 2; 
+      ctx.strokeRect(x, y, size, size); 
       ctx.drawImage(this.image, x, y, size, size);
-      ctx.restore(); // Restaura o estado do contexto
+      ctx.restore();
     };
 
     if (this.image.complete) {
@@ -95,7 +94,6 @@ export class Pipe {
       case "curvedBottomLeft":
         images = [waterImages.curvedBottomTR33, waterImages.curvedBottomTR66, waterImages.curvedBottomTR100]
         this.drawFillingPipe(ctx, x, y, size, images);
-       
         break;
       case "curvedTopRight":
         images = [waterImages.curvedTopBL33, waterImages.curvedTopBL66, waterImages.curvedTopBL100]
@@ -115,13 +113,13 @@ export class Pipe {
   }
 
   private drawFillingPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, images: HTMLImageElement[] ){
-    let fillLevel = 0; // 0: vazio, 1: 33%, 2: 66%, 3: 100%
+    let fillLevel = 0; // 0: empty, 1: 33%, 2: 66%, 3: 100%
 
     const draw = () => {
       if (fillLevel < images.length) {
         ctx.drawImage(images[fillLevel], x, y, size, size);
         fillLevel++;
-        setTimeout(draw, 500); // Espera 500ms antes de desenhar a próxima imagem
+        setTimeout(draw, 500);
       }
     };
 
@@ -135,16 +133,16 @@ export class Pipe {
   public getPossibleConnectionsToAdjacentPipes(): string[] {
     switch (this.type) {
       case "horizontal":
-        return ["east", "west"]; // Conecta-se à direita e à esquerda
+        return ["east", "west"]; 
       case "vertical":
-        return ["north", "south"]; // Conecta-se para cima e para baixo
+        return ["north", "south"]; 
       case "curvedBottomRight":
-        return ["north", "east", "west"]; // Curvado para cima
+        return ["north", "east", "west"]; 
       case "curvedBottomLeft":
-        return ["south", "east", "west"]; // Curvado para baixo
+        return ["south", "east", "west"]; 
       case "cross":
         //verificar a peça anterior pra perceber o caminho (se a peça anterior estiver em cima ele so pode ir pra baixa, nao pode curvar 90º)
-        return ["north", "south", "east", "west"]; // Cross conecta em todas as direções
+        return ["north", "south", "east", "west"]; 
       default:
         return []; // Tipo de tubo inválido
     }

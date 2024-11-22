@@ -101,6 +101,7 @@ export class Grid {
   }
 
   public draw(ctx: CanvasRenderingContext2D) {
+
     ctx.clearRect(0, 0, this.cols * this.cellSize, this.rows * this.cellSize);
 
     for (let row = 0; row < this.rows; row++) {
@@ -115,15 +116,15 @@ export class Grid {
     const { x, y } = this.getCellPosition(row, col, ctx);
 
     if (cell?.isBlocked()) {
-        ctx.fillStyle = "gray";
-        ctx.fillRect(x, y, this.cellSize, this.cellSize);
+        ctx.drawImage(images.blockedcell, x, y, this.cellSize, this.cellSize);
     } else if (cell?.getPipe()) {
         cell.getPipe()?.draw(ctx, x, y, this.cellSize);
     } else {
         this.drawCell(ctx, x, y, this.cellSize);
     }
 
-    ctx.strokeStyle = "black";
+    ctx.strokeStyle = "yellow";
+    ctx.lineWidth = 3;
     ctx.strokeRect(x, y, this.cellSize, this.cellSize);
   }
 
