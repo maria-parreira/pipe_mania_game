@@ -22,7 +22,7 @@ export class Grid {
     this.rows = rows;
     this.cols = cols;
     this.cellSize = cellSize;
-    this.cells = [[],[]];
+    this.cells = [];
     this.initializeGrid();
   }
 
@@ -44,7 +44,8 @@ export class Grid {
   }
 
   private createGrid(blockedIndices: Set<number>): Cell[][] {
-    const grid: Cell[][] = [[],[]];
+    debugger;
+    const grid: Cell[][] = [];
     for (let row = 0; row < this.rows; row++) {
       const gridRow: Cell[] = [];
       for (let col = 0; col < this.cols; col++) {
@@ -74,8 +75,9 @@ export class Grid {
   }
 
   public setCellPipe(row: number, col: number, newPipe: Pipe): void {
+    debugger;
     const cell = this.cells[row][col];
-    if (!cell.isBlocked()) {
+    if (cell && !cell.isBlocked()) {
       cell.setPipe(newPipe);
     }
   }
@@ -160,7 +162,7 @@ private areStartPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: 
     if (randomRow === this.rows - 1) {
         return false;
     }
-    if (this.cells[randomRow][randomCol].isBlocked()) {
+    if (this.cells[randomRow][randomCol]?.isBlocked()) {
         return false;
     }
     const neighbors = this.getNeighboringCells(randomRow, randomCol);
@@ -221,7 +223,7 @@ private isCellBlocked(row: number, col: number): Boolean {
     if (!this.isValidCell(row, col)) {
         return true;
     }
-    return this.cells[row][col].isBlocked();
+    return this.cells[row][col]?.isBlocked();
 }
 
   private generateRandomPipePosition(){

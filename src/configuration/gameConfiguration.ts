@@ -26,7 +26,7 @@ const imagePaths: { [key: string]: string } = {
   horizontal: 'src/assets/pipes/horizontal.png',
   cross: 'src/assets/pipes/cross.png',
   curvedBottomRight: 'src/assets/pipes/curvedBottomRight.png',
-  curvedBottomDown: 'src/assets/pipes/curvedBottomDown.png',
+  curvedBottomLeft: 'src/assets/pipes/curvedBottomLeft.png',
   curvedTopRight: 'src/assets/pipes/curvedTopRight.png',
   curvedTopLeft: 'src/assets/pipes/curvedTopLeft.png',
   bgcell: 'src/assets/bgcell.png',

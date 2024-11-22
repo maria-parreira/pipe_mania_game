@@ -1,6 +1,6 @@
 ﻿import { images, startImages, waterImages } from "../configuration/gameConfiguration";
 
-export type PipeType = "horizontal" | "curvedBottomRight" | "curvedBottomDown" | "cross" | "vertical" | "curvedTopRight" | "curvedTopLeft" ;
+export type PipeType = "horizontal" | "curvedBottomRight" | "curvedBottomLeft" | "cross" | "vertical" | "curvedTopRight" | "curvedTopLeft" ;
 
 /**
  * Represents a Pipe in the game.
@@ -22,7 +22,7 @@ export class Pipe {
   }
 
   private getRandomPipeType(): PipeType {
-    const types: PipeType[] = ["horizontal", "curvedBottomRight", "curvedBottomDown", "cross", "vertical", "curvedTopRight", "curvedTopLeft"];
+    const types: PipeType[] = ["horizontal", "curvedBottomRight", "curvedBottomLeft", "cross", "vertical", "curvedTopRight", "curvedTopLeft"];
     const randomIndex = Math.floor(Math.random() * types.length);
     return types[randomIndex];
   }
@@ -35,8 +35,8 @@ export class Pipe {
         return images.vertical;
       case "curvedBottomRight":
         return images.curvedBottomRight;
-      case "curvedBottomDown":
-        return images.curvedBottomDown;
+      case "curvedBottomLeft":
+        return images.curvedBottomLeft;
       case "curvedTopRight":
         return images.curvedTopRight;
       case "curvedTopLeft":
@@ -91,9 +91,10 @@ export class Pipe {
         images = [waterImages.curvedTopBR33, waterImages.curvedTopBR66, waterImages.curvedTopBR100]
         this.drawFillingPipe(ctx, x, y, size, images);
         break;
-      case "curvedBottomDown":
+      case "curvedBottomLeft":
         images = [waterImages.curvedBottomTR33, waterImages.curvedBottomTR66, waterImages.curvedBottomTR100]
         this.drawFillingPipe(ctx, x, y, size, images);
+       
         break;
       case "curvedTopRight":
         images = [waterImages.curvedTopBL33, waterImages.curvedTopBL66, waterImages.curvedTopBL100]
@@ -134,7 +135,7 @@ export class Pipe {
         return ["north", "south"]; // Conecta-se para cima e para baixo
       case "curvedBottomRight":
         return ["north", "east", "west"]; // Curvado para cima
-      case "curvedBottomDown":
+      case "curvedBottomLeft":
         return ["south", "east", "west"]; // Curvado para baixo
       case "cross":
         //verificar a peça anterior pra perceber o caminho (se a peça anterior estiver em cima ele so pode ir pra baixa, nao pode curvar 90º)
