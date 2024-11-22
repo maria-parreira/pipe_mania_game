@@ -162,10 +162,10 @@ export class Grid {
         this.cells[row][col].setBlocked(true);
     }
 }
+
+
 private areStartPointCoordinatesValid(randomRow: number, randomCol: number, ctx: CanvasRenderingContext2D): boolean {
-    if (randomRow === this.rows - 1) {
-        return false;
-    }
+
     if (this.cells[randomRow][randomCol]?.isBlocked()) {
         return false;
     }
@@ -270,13 +270,13 @@ private isCellBlocked(row: number, col: number): Boolean {
   
   private getAdjacentCellPipe(row: number, col: number, direction: string): [number, number] | null {
     switch (direction) {
-      case "north":
+      case "top":
         return row > 0 ? [row - 1, col] : null;
-      case "south":
+      case "bottom":
         return row < this.cells.length - 1 ? [row + 1, col] : null;
-      case "east":
+      case "right":
         return col < this.cells[0].length - 1 ? [row, col + 1] : null;
-      case "west":
+      case "left":
         return col > 0 ? [row, col - 1] : null;
       default:
         return null;

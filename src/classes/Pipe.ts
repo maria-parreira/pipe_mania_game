@@ -69,18 +69,17 @@ export class Pipe {
   public getPossibleConnectionsToAdjacentPipes(): string[] {
     switch (this.type) {
       case "horizontal":
-        return ["east", "west"]; 
+        return ["left", "right"]; 
       case "vertical":
-        return ["north", "south"]; 
+        return ["top", "bottom"]; 
       case "curvedBottomRight":
-        return ["north", "east", "west"]; 
+        return ["bottom", "right"]; 
       case "curvedBottomLeft":
-        return ["south", "east", "west"]; 
+        return ["bottom", "left"]; 
       case "cross":
-        //verificar a peça anterior pra perceber o caminho (se a peça anterior estiver em cima ele so pode ir pra baixa, nao pode curvar 90º)
-        return ["north", "south", "east", "west"]; 
+        return ["bottom", "top", "right", "left"]; 
       default:
-        return []; // Tipo de tubo inválido
+        return []; 
     }
   }
 
