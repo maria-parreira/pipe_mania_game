@@ -1,6 +1,7 @@
 ﻿import { images } from "../configuration/gameConfiguration";
 import { Cell } from "./Cell";
 import { Pipe } from './Pipe';
+import { StartPoint } from "./StartPoint";
 
 /**
  * The Grid class represents a two-dimensional grid structure that manages the state of each cell.
@@ -14,9 +15,8 @@ export class Grid {
   private cols: number;
   private cellSize: number;
   private cells: Cell[][];
-  private cellWithStartPipe: { x: number; y: number } | null = null;
-  private startPipe: Pipe | null = null;
-  private image: HTMLImageElement = images.bgcell;
+  private cellWithStartPoint: { x: number; y: number } | null = null;
+  private startPoint: StartPoint | null = null;
 
   constructor(rows: number, cols: number, cellSize: number) {
     this.rows = rows;
@@ -106,12 +106,12 @@ export class Grid {
 
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
-        this.drawCellWithImages(ctx, row, col);
+        this.drawCellAndPipe(ctx, row, col);
       }
     }
   }
 
-  private drawCellWithImages(ctx: CanvasRenderingContext2D, row: number, col: number) {
+  private drawCellAndPipe(ctx: CanvasRenderingContext2D, row: number, col: number) {
     const cell = this.cells[row][col];
     const { x, y } = this.getCellPosition(row, col, ctx);
 
@@ -120,7 +120,7 @@ export class Grid {
     } else if (cell?.getPipe()) {
         cell.getPipe()?.draw(ctx, x, y, this.cellSize);
     } else {
-        this.drawCell(ctx, x, y, this.cellSize);
+        cell.draw(ctx, x, y, this.cellSize);
     }
 
     ctx.strokeStyle = "yellow";
@@ -128,51 +128,41 @@ export class Grid {
     ctx.strokeRect(x, y, this.cellSize, this.cellSize);
   }
 
-  private drawCell(ctx: CanvasRenderingContext2D, x: number, y: number, size:number ): void {
-    if (this.image.complete) {
-        ctx.drawImage(this.image, x, y, size, size);
-      } else {
-        this.image.onload = () => {
-          ctx.drawImage(this.image, x, y, size, size);
-        };
-      }
-  }
-
-  public drawStartPipe(ctx: CanvasRenderingContext2D, cellSize: number) {
-    if (!this.cellWithStartPipe) {
-        this.initializeStartPipe(ctx);
+  public drawStartPoint(ctx: CanvasRenderingContext2D, cellSize: number) {
+    if (!this.cellWithStartPoint) {
+        this.initializeStartPoint(ctx);
     }
 
-    const { x, y } = this.cellWithStartPipe!;
-    this.startPipe?.drawStartPipe(ctx, x, y, cellSize);
+    const { x, y } = this.cellWithStartPoint!;
+    this.startPoint?.drawStartPoint(ctx, x, y, cellSize);
     
-    this.blockCellAtStartPipeCoordinates(ctx);
+    this.blockCellAtStartPoint(ctx);
   }
 
-  private initializeStartPipe(ctx: CanvasRenderingContext2D) {
+  private initializeStartPoint(ctx: CanvasRenderingContext2D) {
     let cellFound = false;
 
     while (!cellFound) {
-        const { randomRow, randomCol } = this.generateRandomPipePosition();
-        this.cellWithStartPipe = { x: randomCol, y: randomRow }; 
-        if (this.areStartPipeCoordinatesValid(randomRow, randomCol, ctx)) {
+        const { randomRow, randomCol } = this.generateRandomCellCoordinates();
+        this.cellWithStartPoint = { x: randomCol, y: randomRow }; 
+        if (this.areStartPointCoordinatesValid(randomRow, randomCol, ctx)) {
             cellFound = true;
         }
     }
 
-    if (!this.startPipe) {
-        this.startPipe = new Pipe();
+    if (!this.startPoint) {
+        this.startPoint = new StartPoint();
     }
   }
 
-  private blockCellAtStartPipeCoordinates(ctx: CanvasRenderingContext2D) {
-    const startPipeCoordinates = this.getCellStartPipeCoordinates(ctx);
+  private blockCellAtStartPoint(ctx: CanvasRenderingContext2D) {
+    const startPipeCoordinates = this.getCellStartPointCoordinates(ctx);
     if (startPipeCoordinates) {
         const { row, col } = startPipeCoordinates;
         this.cells[row][col].setBlocked(true);
     }
 }
-private areStartPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: CanvasRenderingContext2D): boolean {
+private areStartPointCoordinatesValid(randomRow: number, randomCol: number, ctx: CanvasRenderingContext2D): boolean {
     if (randomRow === this.rows - 1) {
         return false;
     }
@@ -187,7 +177,7 @@ private areStartPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: 
     }
     const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
     const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY);
-    this.cellWithStartPipe = { x, y };
+    this.cellWithStartPoint = { x, y };
     return true;
 }
 
@@ -207,7 +197,7 @@ private tryMoveStartPipe(row: number, col: number, ctx: CanvasRenderingContext2D
             if (isValidPosition) {
                 const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
                 const { x, y } = this.getGridCoordinate(newRow, newCol, borderIntervalX, borderIntervalY);
-                this.cellWithStartPipe = { x, y };
+                this.cellWithStartPoint = { x, y };
                 return true;
             }
         }
@@ -228,7 +218,7 @@ private getNeighboringCells(row: number, col: number): { row: number; col: numbe
         .filter(({ row, col }) => this.isValidCell(row, col)); 
 }
 
-private isValidCell(row: number, col: number): Boolean {
+public isValidCell(row: number, col: number): Boolean {
     return row >= 0 && row < this.rows && col >= 0 && col < this.cols;
 }
 
@@ -239,7 +229,7 @@ private isCellBlocked(row: number, col: number): Boolean {
     return this.cells[row][col]?.isBlocked();
 }
 
-  private generateRandomPipePosition(){
+  private generateRandomCellCoordinates(){
     const rows = this.cells.length;
     const cols = this.cells[0].length;
 
@@ -297,9 +287,9 @@ private isCellBlocked(row: number, col: number): Boolean {
     return this.cells[row][col];
   }
 
-  public getCellStartPipeCoordinates(ctx:CanvasRenderingContext2D): { row: number; col: number } | null {
-    if (this.cellWithStartPipe) {
-        const { x, y } = this.cellWithStartPipe;
+  public getCellStartPointCoordinates(ctx:CanvasRenderingContext2D): { row: number; col: number } | null {
+    if (this.cellWithStartPoint) {
+        const { x, y } = this.cellWithStartPoint;
         const col = Math.floor((x - this.getBorderIntervalX(ctx)) / this.cellSize);
         const row = Math.floor((y - this.getBorderIntervalY(ctx)) / this.cellSize);
         return { row, col };

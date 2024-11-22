@@ -2,6 +2,7 @@
 import { GameConfiguration } from "../configuration/gameConfiguration"; 
 import { PipeQueue } from "./PipeQueue";
 import { Pipe } from "./Pipe";
+import { WaterFlow } from "./WaterFlow";
 
 
 /**
@@ -19,6 +20,7 @@ export class Game {
   pipeQueue: PipeQueue = new PipeQueue(5);
   private selectedPipe: Pipe | null = null;
   private isRunning: boolean = true;
+  private waterFlow: WaterFlow | null;
 
   private countdown: number = 10; // Tempo restante para a água começar
   private timerInterval: number | null = null; // Referência para o intervalo do temporizador
@@ -29,11 +31,13 @@ export class Game {
     canvas: HTMLCanvasElement,
     queueContainer: HTMLElement,
     gameStatus: HTMLElement,
-    grid: Grid
+    grid: Grid,
+    waterFlow: WaterFlow
   ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.grid = grid;
+    this.waterFlow=waterFlow;
 
     this.addEventListeners();
     this.startGame(this.ctx);
@@ -50,7 +54,7 @@ export class Game {
         this.countdown--; 
       } else {
         this.stopCountdown(); // Para o temporizador quando chega a 0
-        this.startWaterFlow(this.ctx)
+        this.startWaterFlow()
       }
     }, 1000); // Intervalo de 1 segundo
   }
@@ -62,12 +66,15 @@ export class Game {
     }
   }
 
-  private startWaterFlow(ctx:CanvasRenderingContext2D) {
-    const cellWithStartPipePosition = this.grid.getCellStartPipeCoordinates()
-    const row = cellWithStartPipePosition?.row
-    const col = cellWithStartPipePosition?.col
-    
-  }
+  private startWaterFlow() {
+    const startPipeCoordinates = this.grid.getCellStartPointCoordinates(this.ctx);
+    console.log("Coordenadas do ponto inicial:", startPipeCoordinates);
+    if (startPipeCoordinates) {
+        const { row, col } = startPipeCoordinates;
+        this.waterFlow?.flowWaterFromCell(row, col);
+    }
+}
+
 
   private runGameLoop() {
     const gameLoop = () => {
@@ -82,7 +89,7 @@ export class Game {
 
   private updateGame() {
     if (this.countdown === 0) {
-      this.startWaterFlow(this.ctx); // Atualiza o fluxo de água quando o tempo chega a zero
+      this.startWaterFlow(); // Atualiza o fluxo de água quando o tempo chega a zero
     }
   }
 
@@ -90,7 +97,7 @@ export class Game {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.grid.draw(this.ctx);
-    this.grid.drawStartPipe(this.ctx, 50);
+    this.grid.drawStartPoint(this.ctx, 50);
     this.pipeQueue.drawPipeQueue(this.ctx, 10, 150);
 
     this.drawHUD();
