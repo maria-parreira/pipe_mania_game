@@ -63,8 +63,8 @@ export class Game {
   }
 
   private startWaterFlow(ctx:CanvasRenderingContext2D) {
-    const row = this.grid.getStartPipeCoordinates(this.ctx)?.row ?? 0;
-    const col = this.grid.getStartPipeCoordinates(this.ctx)?.col ?? 0;
+    const row = this.grid.getCellStartPipeCoordinates(this.ctx)?.row ?? 0;
+    const col = this.grid.getCellStartPipeCoordinates(this.ctx)?.col ?? 0;
     this.grid.updateAdjacentCellWithWater(this.ctx, row, col);
   }
 

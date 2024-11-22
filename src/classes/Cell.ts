@@ -33,6 +33,10 @@ export class Cell {
         return this.blocked;
     }
 
+    public setBlocked(blocked: boolean): void {
+        this.blocked = blocked; 
+    }
+
     public fillPipeWithWater(ctx: CanvasRenderingContext2D){
         this.pipe?.fillWithWater();
         this.pipe?.drawWaterPipe(ctx, this.row, this.col, this.size);

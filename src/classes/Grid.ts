@@ -156,6 +156,12 @@ export class Grid {
 
     const { x, y } = this.startPipePosition!;
     this.startPipe?.drawStartPipe(ctx, x, y, cellSize);
+    
+    const startPipeCoordinates = this.getCellStartPipeCoordinates(ctx);
+    if (startPipeCoordinates) {
+        const { row, col } = startPipeCoordinates;
+        this.cells[row][col].setBlocked(true);
+    }
 }
 
 private areStartPipeCoordinatesValid(randomRow: number, randomCol: number, ctx: CanvasRenderingContext2D): boolean {
@@ -283,7 +289,7 @@ private isCellBlocked(row: number, col: number): Boolean {
     return this.cells[row][col];
   }
 
-  public getStartPipeCoordinates(ctx:CanvasRenderingContext2D): { row: number; col: number } | null {
+  public getCellStartPipeCoordinates(ctx:CanvasRenderingContext2D): { row: number; col: number } | null {
     if (this.startPipePosition) {
         const { x, y } = this.startPipePosition;
         const col = Math.floor((x - this.getBorderIntervalX(ctx)) / this.cellSize);
