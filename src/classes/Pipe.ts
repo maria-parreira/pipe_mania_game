@@ -8,11 +8,12 @@ export type PipeType = "horizontal" | "curvedBottomRight" | "curvedBottomLeft" |
  * and drawing the pipe on the canvas.
  * Includes start pipe, end pipe, and water in the pipe.
  */
+
 export class Pipe {
   private image: HTMLImageElement;
   private startImage: HTMLImageElement;
   private type: PipeType;
-  private containsWater: Boolean;
+  private containsWater: boolean;
 
   constructor() {
     this.type = this.getRandomPipeType();
@@ -76,7 +77,7 @@ export class Pipe {
     ctx.drawImage(this.startImage, x, y, size, size);
   }
 
-  // Método para desenhar o tubo com água
+
   public drawWaterPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
     let images: HTMLImageElement[];
     switch (this.type) {
@@ -127,6 +128,10 @@ export class Pipe {
     draw();
   }
 
+  public fillWithWater(){
+    this.containsWater = true;
+  }
+
   public getPossibleConnectionsToAdjacentPipes(): string[] {
     switch (this.type) {
       case "horizontal":
@@ -145,11 +150,4 @@ export class Pipe {
     }
   }
 
-  public getType(): PipeType {
-    return this.type;
-  }
-
-  public fillWithWater(){
-    this.containsWater = true;
-  }
 }

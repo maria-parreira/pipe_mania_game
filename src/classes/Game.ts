@@ -36,21 +36,21 @@ export class Game {
     this.grid = grid;
 
     this.addEventListeners();
-    this.startGame();
+    this.startGame(this.ctx);
   }
 
-  public startGame() {
-    this.startCountdown(); // Inicia o temporizador de contagem regressiva
+  public startGame(ctx:CanvasRenderingContext2D) {
+    this.startCountdown(ctx); // Inicia o temporizador de contagem regressiva
     this.runGameLoop();
   }
 
-  private startCountdown() {
+  private startCountdown(ctx:CanvasRenderingContext2D) {
     this.timerInterval = window.setInterval(() => {
       if (this.countdown > 0) {
-        this.countdown--; // Diminui o contador
+        this.countdown--; 
       } else {
         this.stopCountdown(); // Para o temporizador quando chega a 0
-        this.startWaterFlow(); // Inicia o fluxo de água quando o contador chega a 0
+        this.startWaterFlow(this.ctx)
       }
     }, 1000); // Intervalo de 1 segundo
   }
@@ -62,8 +62,10 @@ export class Game {
     }
   }
 
-  private startWaterFlow() {
-    // A partir deste momento, a água começa a fluir
+  private startWaterFlow(ctx:CanvasRenderingContext2D) {
+    const row = this.grid.getStartPipeCoordinates(this.ctx)?.row ?? 0;
+    const col = this.grid.getStartPipeCoordinates(this.ctx)?.col ?? 0;
+    this.grid.updateAdjacentCellWithWater(this.ctx, row, col);
   }
 
   private runGameLoop() {
@@ -78,39 +80,32 @@ export class Game {
   }
 
   private updateGame() {
-    // Atualizações gerais do jogo podem ser adicionadas aqui
     if (this.countdown === 0) {
-      // Quando o tempo chega a zero, o fluxo de água pode ser atualizado
-      
+      this.startWaterFlow(this.ctx); // Atualiza o fluxo de água quando o tempo chega a zero
     }
   }
 
   private drawGame() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // Renderiza os elementos do jogo
-    this.grid.drawGrid(this.ctx);
+    this.grid.draw(this.ctx);
     this.grid.drawStartPipeInGrid(this.ctx, 50);
     this.pipeQueue.drawPipeQueue(this.ctx, 10, 150);
 
-    // Renderiza o HUD (incluindo o contador regressivo e pontuação)
     this.drawHUD();
   }
 
   private drawHUD() {
     this.ctx.font = "20px Arial";
     this.ctx.fillStyle = "black";
-
-    // Renderiza a contagem regressiva
     this.ctx.fillText(
       `Time until water: ${this.countdown}s`,
       10,
       20
     );
-
-    // Renderiza a pontuação
     this.ctx.fillText(`Score: ${this.score}`, 10, 50);
   }
+
 
   private addEventListeners() {
     this.canvas.addEventListener("click", this.handleGridClick.bind(this));
@@ -123,12 +118,13 @@ export class Game {
     const row = Math.floor(y / GameConfiguration.cellSize);
 
     if (row >= 0 && row < GameConfiguration.rows && col >= 0 && col < GameConfiguration.cols) {
-      this.handlePipeSelection();
-      if (this.selectedPipe) {
-        this.grid.setCellPipe(row, col, this.selectedPipe);
+      if (!this.grid.getGridCell(row,col).isBlocked()) {
+        this.handlePipeSelection();
+        if (this.selectedPipe) {
+          this.grid.setPipeInCell(row, col, this.selectedPipe);
 
-        // Incrementa a pontuação
-        this.score += 10; // Ajuste o valor da pontuação conforme necessário
+          this.score += 10; 
+        }
       }
     }
   }

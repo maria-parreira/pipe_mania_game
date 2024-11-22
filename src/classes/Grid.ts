@@ -74,51 +74,6 @@ export class Grid {
     return (ctx.canvas.height - (this.rows * this.cellSize)) / 2;
   }
 
-  public setCellPipe(row: number, col: number, newPipe: Pipe): void {
-    debugger;
-    const cell = this.cells[row][col];
-    if (cell && !cell.isBlocked()) {
-      cell.setPipe(newPipe);
-    }
-  }
-
-  public drawGrid(ctx: CanvasRenderingContext2D) {
-    ctx.clearRect(0, 0, this.cols * this.cellSize, this.rows * this.cellSize);
-
-    for (let row = 0; row < this.rows; row++) {
-      for (let col = 0; col < this.cols; col++) {
-        this.drawCell(ctx, row, col);
-      }
-    }
-  }
-
-  // Novo método para desenhar a célula
-  public drawoneCell(ctx: CanvasRenderingContext2D, x: number, y: number, size:number ): void {
-    if (this.image.complete) {
-        ctx.drawImage(this.image, x, y, size, size);
-      } else {
-        this.image.onload = () => {
-          ctx.drawImage(this.image, x, y, size, size);
-        };
-      }
-  }
-
-  private drawCell(ctx: CanvasRenderingContext2D, row: number, col: number) {
-    const cell = this.cells[row][col];
-    const { x, y } = this.getCellPosition(row, col, ctx);
-
-    if (cell?.isBlocked()) {
-        ctx.fillStyle = "gray";
-        ctx.fillRect(x, y, this.cellSize, this.cellSize);
-    } else if (cell?.getPipe()) {
-        cell.getPipe()?.draw(ctx, x, y, this.cellSize);
-    } else {
-        this.drawoneCell(ctx, x, y, this.cellSize);
-    }
-
-    ctx.strokeStyle = "black";
-    ctx.strokeRect(x, y, this.cellSize, this.cellSize);
-  }
 
   private getCellPosition(row: number, col: number, ctx: CanvasRenderingContext2D) {
     const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
@@ -135,6 +90,51 @@ export class Grid {
     const x = borderIntervalX + col * this.cellSize;
     const y = borderIntervalY + row * this.cellSize;
     return { x, y };
+  }
+
+  public setPipeInCell(row: number, col: number, newPipe: Pipe): void {
+    debugger;
+    const cell = this.cells[row][col];
+    if (cell && !cell.isBlocked()) {
+      cell.setPipe(newPipe);
+    }
+  }
+
+  public draw(ctx: CanvasRenderingContext2D) {
+    ctx.clearRect(0, 0, this.cols * this.cellSize, this.rows * this.cellSize);
+
+    for (let row = 0; row < this.rows; row++) {
+      for (let col = 0; col < this.cols; col++) {
+        this.drawGridCell(ctx, row, col);
+      }
+    }
+  }
+
+  private drawGridCell(ctx: CanvasRenderingContext2D, row: number, col: number) {
+    const cell = this.cells[row][col];
+    const { x, y } = this.getCellPosition(row, col, ctx);
+
+    if (cell?.isBlocked()) {
+        ctx.fillStyle = "gray";
+        ctx.fillRect(x, y, this.cellSize, this.cellSize);
+    } else if (cell?.getPipe()) {
+        cell.getPipe()?.draw(ctx, x, y, this.cellSize);
+    } else {
+        this.drawCell(ctx, x, y, this.cellSize);
+    }
+
+    ctx.strokeStyle = "black";
+    ctx.strokeRect(x, y, this.cellSize, this.cellSize);
+  }
+
+  private drawCell(ctx: CanvasRenderingContext2D, x: number, y: number, size:number ): void {
+    if (this.image.complete) {
+        ctx.drawImage(this.image, x, y, size, size);
+      } else {
+        this.image.onload = () => {
+          ctx.drawImage(this.image, x, y, size, size);
+        };
+      }
   }
 
   public drawStartPipeInGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
@@ -187,7 +187,6 @@ private tryMoveStartPipe(row: number, col: number, ctx: CanvasRenderingContext2D
 
     for (const { row: newRow, col: newCol } of directions) {
         if (this.isValidCell(newRow, newCol) && !this.isCellBlocked(newRow, newCol)) {
-            // Verifica se a nova posição está livre e se não há bloqueios ao redor dela
             const neighbors = this.getNeighboringCells(newRow, newCol);
             const isValidPosition = neighbors.every(({ row, col }) => !this.isCellBlocked(row, col));
 
@@ -238,7 +237,7 @@ private isCellBlocked(row: number, col: number): Boolean {
 
 
   // Função para atualizar o estado da célula adjacente e desenhar o water pipe
-  private updateAdjacentCellWithWater(ctx:CanvasRenderingContext2D, row: number, col: number): void {
+  public updateAdjacentCellWithWater(ctx:CanvasRenderingContext2D, row: number, col: number): void {
     const adjacentCoordinates = this.hasAdjacentConnections(row, col);
     if (adjacentCoordinates) {
       const { row: adjRow, col: adjCol } = adjacentCoordinates;
@@ -248,10 +247,6 @@ private isCellBlocked(row: number, col: number): Boolean {
     }
   }
 
-  // recebe a col e row da celula atual e vai buscar o pipe;
-  // verifica se o pipe tem conexoes com outros ao lado
-  // se a resposta anterior for true, com base na col e row da celula atual 
-  // devolve a row e col da celula para onde vai a seguir com a qual tem ligação
   private hasAdjacentConnections(row: number, col: number):{ row: number; col: number } | null {
     const currentPipe = this.cells[row][col].getPipe();
     const possibleConnections = currentPipe?.getPossibleConnectionsToAdjacentPipes() || [];
@@ -266,25 +261,37 @@ private isCellBlocked(row: number, col: number): Boolean {
         }
       }
     }
-    return null; // Nenhum tubo adjacente encontrado
+    return null; 
   }
   
-    // Retorna as coordenadas da célula adjacente na direção dada
-    private getAdjacentCellPipe(row: number, col: number, direction: string): [number, number] | null {
-      switch (direction) {
-        case "north":
-          return row > 0 ? [row - 1, col] : null;
-        case "south":
-          return row < this.cells.length - 1 ? [row + 1, col] : null;
-        case "east":
-          return col < this.cells[0].length - 1 ? [row, col + 1] : null;
-        case "west":
-          return col > 0 ? [row, col - 1] : null;
-        default:
-          return null;
-      }
+  private getAdjacentCellPipe(row: number, col: number, direction: string): [number, number] | null {
+    switch (direction) {
+      case "north":
+        return row > 0 ? [row - 1, col] : null;
+      case "south":
+        return row < this.cells.length - 1 ? [row + 1, col] : null;
+      case "east":
+        return col < this.cells[0].length - 1 ? [row, col + 1] : null;
+      case "west":
+        return col > 0 ? [row, col - 1] : null;
+      default:
+        return null;
     }
+  }
 
+  public getGridCell(row: number, col: number): Cell {
+    return this.cells[row][col];
+  }
+
+  public getStartPipeCoordinates(ctx:CanvasRenderingContext2D): { row: number; col: number } | null {
+    if (this.startPipePosition) {
+        const { x, y } = this.startPipePosition;
+        const col = Math.floor((x - this.getBorderIntervalX(ctx)) / this.cellSize);
+        const row = Math.floor((y - this.getBorderIntervalY(ctx)) / this.cellSize);
+        return { row, col };
+    }
+    return null; 
+}
 
 
 }
