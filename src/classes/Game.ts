@@ -2,7 +2,7 @@
 import { GameConfiguration } from "../configuration/gameConfiguration"; 
 import { PipeQueue } from "./PipeQueue";
 import { Pipe } from "./Pipe";
-import { WaterFlow } from "./WaterFlow";
+import { WaterPipe } from "./WaterFlow";
 
 
 /**
@@ -20,7 +20,7 @@ export class Game {
   pipeQueue: PipeQueue = new PipeQueue(5);
   private selectedPipe: Pipe | null = null;
   private isRunning: boolean = true;
-  private waterFlow: WaterFlow | null;
+  private waterFlow: WaterPipe | null;
 
   private countdown: number = 10; // Tempo restante para a água começar
   private timerInterval: number | null = null; // Referência para o intervalo do temporizador
@@ -32,7 +32,7 @@ export class Game {
     queueContainer: HTMLElement,
     gameStatus: HTMLElement,
     grid: Grid,
-    waterFlow: WaterFlow
+    waterFlow: WaterPipe
   ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
@@ -131,16 +131,16 @@ export class Game {
 
         // Atualiza as coordenadas com base na direção
         switch (direction) {
-          case 'north':
+          case 'top':
             newRow -= 1;
             break;
-          case 'south':
+          case 'bottom':
             newRow += 1;
             break;
-          case 'west':
+          case 'right':
             newCol -= 1;
             break;
-          case 'east':
+          case 'left':
             newCol += 1;
             break;
         }

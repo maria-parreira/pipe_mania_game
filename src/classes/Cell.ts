@@ -1,6 +1,6 @@
 ﻿import { images } from '../configuration/gameConfiguration';
 import { Pipe } from './Pipe'
-import { WaterFlow } from './WaterFlow';
+import { WaterPipe } from './WaterFlow';
 
 /**
  * Represents an individual cell in the grid.
@@ -14,7 +14,7 @@ export class Cell {
     private pipe: Pipe | null; 
     private blocked: boolean;
     private image: HTMLImageElement = images.bgcell;
-    private waterFlow: WaterFlow | null = null;
+    private waterFlow: WaterPipe | null = null;
 
     constructor(row: number, col: number, size:number, blocked: boolean) {
         this.row = row;

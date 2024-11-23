@@ -2,7 +2,7 @@
 import { Pipe, PipeType } from "./Pipe";
 import { Grid } from "./Grid";
 
-export class WaterFlow {
+export class WaterPipe {
   private pipe: Pipe;
   private grid : Grid;
   private ctx: CanvasRenderingContext2D;
@@ -85,16 +85,16 @@ export class WaterFlow {
   
                 // Determina a célula adjacente com base na direção
                 switch (direction) {
-                    case "north":
+                    case "top":
                         adjacentRow--;
                         break;
-                    case "south":
+                    case "bottom":
                         adjacentRow++;
                         break;
-                    case "east":
+                    case "right":
                         adjacentCol++;
                         break;
-                    case "west":
+                    case "left":
                         adjacentCol--;
                         break;
                 }
