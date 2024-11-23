@@ -71,7 +71,6 @@ export class RegularPipe implements Pipe {
   }
 
   public getPossibleConnectionsToAdjacentPipes(): string[] {
-    debugger;
     switch (this.type) {
       case PipeType.Horizontal:
         return ["left", "right"]; 

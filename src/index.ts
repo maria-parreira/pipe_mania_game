@@ -8,10 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.width = (GameConfiguration.cols * GameConfiguration.cellSize) + 200
   canvas.height = (GameConfiguration.rows * GameConfiguration.cellSize) + 200
 
-  const queueContainer = document.getElementById("pipe-queue")!;
-  const gameStatus = document.getElementById("game-status")!;
   const grid = new Grid(GameConfiguration.rows, GameConfiguration.cols, GameConfiguration.cellSize);
 
-  const game = new Game(canvas, queueContainer, gameStatus, grid);
-  game.startGame();
+  const game = new Game(canvas, grid);
 });

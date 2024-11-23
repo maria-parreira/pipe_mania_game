@@ -114,6 +114,7 @@ export class Grid {
         }
     }
 
+
     private drawCellAndPipe(ctx: CanvasRenderingContext2D, row: number, col: number) {
         const cell = this.cells[row][col];
         const { x, y } = this.getCellPosition(row, col, ctx);
@@ -181,7 +182,6 @@ export class Grid {
     }
 
     private updateAdjacentConnections(ctx: CanvasRenderingContext2D, row: number, col: number): void {
-        debugger;
         const possibleConnections = this.getPossibleConnectionsToAdjacentPipes(this.cells[row][col]) || [];
 
         for (const cell of possibleConnections) {
@@ -190,7 +190,7 @@ export class Grid {
     }
 
     private updateAdjacentCellWithWaterPipe(ctx: CanvasRenderingContext2D, row: number, col: number, adjacent: Cell): void{
-        debugger;
+       debugger;
         const adjacentCellRow = adjacent.getRow();
         const adjacentCellCol = adjacent.getCol();
 
@@ -198,32 +198,37 @@ export class Grid {
         const currentPipeType = this.cells[row][col].getPipe()?.getType();
         const adjacentPipeType = this.cells[adjacentCellRow][adjacentCellCol].getPipe()?.getType();
 
-        let waterPipe: Pipe | null = null;
+        let waterPipe: WaterPipe | null = null;
         if( adjacentPipeType != null){
             switch (direction) {
                 case "up":
                     if(currentPipeType == PipeType.StartUp || currentPipeType == PipeType.Vertical || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomLeft || currentPipeType == PipeType.CurvedTopRight){
                         waterPipe = new WaterPipe(adjacentPipeType);
+                        break;
                     }
                 case "down":
                     if(currentPipeType == PipeType.StartDown || currentPipeType == PipeType.Vertical || currentPipeType == PipeType.Cross|| currentPipeType == PipeType.CurvedBottomRight || currentPipeType == PipeType.CurvedTopLeft){
                         waterPipe = new WaterPipe(adjacentPipeType);
+                        break;
                     }            
                 case "right":
                     if(currentPipeType == PipeType.StartRight || currentPipeType == PipeType.Horizontal || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomRight || currentPipeType == PipeType.CurvedTopRight){
                         waterPipe = new WaterPipe(adjacentPipeType);
+                        break;
                     }            
                 case "left":
                     if(currentPipeType == PipeType.StartLeft || currentPipeType == PipeType.Horizontal || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomLeft || currentPipeType == PipeType.CurvedTopLeft){
                         waterPipe = new WaterPipe(adjacentPipeType);
+                        break;
                     }    
             }
         }
         
         if(waterPipe){
-            this.cells[row][col].setPipe(waterPipe);
+            this.cells[adjacentCellRow][adjacentCellCol].setPipe(waterPipe);
             const { x, y} = this.getCellPosition(adjacentCellRow,adjacentCellCol,ctx);
-            waterPipe.draw(ctx,x,y,this.cellSize);
+            waterPipe.fillPipeWithWater()
+            //this.cells[adjacentCellRow][adjacentCellCol].setBlocked(true);
         }
     }
 

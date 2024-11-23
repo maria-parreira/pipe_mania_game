@@ -20,7 +20,6 @@ export class Game {
   pipeQueue: PipeQueue = new PipeQueue(5);
   private selectedPipe: Pipe | null = null;
   private isRunning: boolean = true;
-  private waterFlow: WaterPipe | null;
 
   private countdown: number = 10; // Tempo restante para a água começar
   private timerInterval: number | null = null; // Referência para o intervalo do temporizador
@@ -29,16 +28,11 @@ export class Game {
 
   constructor(
     canvas: HTMLCanvasElement,
-    queueContainer: HTMLElement,
-    gameStatus: HTMLElement,
-    grid: Grid,
-    waterFlow: WaterPipe
+    grid: Grid
   ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.grid = grid;
-    this.waterFlow=waterFlow;
-
     this.addEventListeners();
     this.startGame(this.ctx);
   }
@@ -78,18 +72,11 @@ export class Game {
   private runGameLoop() {
     const gameLoop = () => {
       if (this.isRunning) {
-        this.updateGame();
         this.drawGame();
         requestAnimationFrame(gameLoop);
       }
     };
     requestAnimationFrame(gameLoop);
-  }
-
-  private updateGame() {
-    if (this.countdown === 0) {
-      this.startWaterFlow(); // Atualiza o fluxo de água quando o tempo chega a zero
-    }
   }
 
   private drawGame() {
