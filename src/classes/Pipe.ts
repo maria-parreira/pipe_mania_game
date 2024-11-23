@@ -67,6 +67,7 @@ export class Pipe {
 
 
   public getPossibleConnectionsToAdjacentPipes(): string[] {
+    debugger;
     switch (this.type) {
       case "horizontal":
         return ["left", "right"]; 

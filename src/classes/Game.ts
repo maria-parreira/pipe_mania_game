@@ -2,7 +2,7 @@
 import { GameConfiguration } from "../configuration/gameConfiguration"; 
 import { PipeQueue } from "./PipeQueue";
 import { Pipe } from "./Pipe";
-import { WaterPipe } from "./WaterFlow";
+import { WaterPipe } from "./WaterPipe";
 
 
 /**
@@ -67,14 +67,17 @@ export class Game {
   }
 
   private startWaterFlow() {
-    const startPipeCoordinates = this.grid.getCellStartPointCoordinates(this.ctx);
-    console.log("Coordenadas do ponto inicial:", startPipeCoordinates);
-    if (startPipeCoordinates) {
-        const { row, col } = startPipeCoordinates;
-        this.waterFlow?.flowWaterFromCell(row, col);
-        
-        // Inspecionar células ao redor
-        this.inspectSurroundingCells(row, col);
+    debugger;
+    const startPipeCoordinates = this.grid.getCellWithStartPoint();
+    const row = startPipeCoordinates?.y!;
+    const col = startPipeCoordinates?.x!;
+    this.grid.updateAdjacentCellWithWater(this.ctx, row, col);
+    const adjacentCellCoordinates = this.grid.hasAdjacentConnections(row, col);
+    const adjacentCell = this.grid.getGridCell(adjacentCellCoordinates?.row ?? 0, adjacentCellCoordinates?.col ?? 0);
+    const pipe = adjacentCell.getPipe();
+    if (pipe) {
+        const waterPipe = new WaterPipe(pipe, this.grid, this.ctx);
+        waterPipe.drawWaterPipe;
     }
   }
 

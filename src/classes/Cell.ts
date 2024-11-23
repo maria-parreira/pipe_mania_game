@@ -1,6 +1,6 @@
 ﻿import { images } from '../configuration/gameConfiguration';
 import { Pipe } from './Pipe'
-import { WaterPipe } from './WaterFlow';
+import { WaterPipe } from './WaterPipe';
 
 /**
  * Represents an individual cell in the grid.

@@ -45,7 +45,6 @@ export class Grid {
     }
 
     private createGrid(blockedIndices: Set<number>): Cell[][] {
-        debugger;
         const grid: Cell[][] = [];
         for (let row = 0; row < this.rows; row++) {
             const gridRow: Cell[] = [];
@@ -71,6 +70,10 @@ export class Grid {
         return ctx.canvas.getBoundingClientRect().y + this.getBorderIntervalY(ctx);
     }
 
+    public getCellWithStartPoint(){
+        return this.cellWithStartPoint;
+    }
+
     private getBorderIntervalY(ctx: CanvasRenderingContext2D) {
         return (ctx.canvas.height - (this.rows * this.cellSize)) / 2;
     }
@@ -93,7 +96,6 @@ export class Grid {
     }
 
     public setPipeInCell(row: number, col: number, newPipe: Pipe): void {
-        debugger;
         const cell = this.cells[row][col];
         if (cell && !cell.isBlocked()) {
             cell.setPipe(newPipe);
@@ -132,22 +134,20 @@ export class Grid {
             this.initializeStartPoint(ctx);
         }
 
-        const { x, y } = this.cellWithStartPoint!;
-        this.startPoint?.drawStartPoint(ctx, x, y, cellSize);
+        if (this.cellWithStartPoint) {
+            const { x, y } = this.getCellPosition(this.cellWithStartPoint.x, this.cellWithStartPoint.y, ctx);
 
-        this.blockCellAtStartPoint(ctx);
+            this.startPoint?.drawStartPoint(ctx, x, y, cellSize);
+
+            this.blockCellAtStartPoint(ctx);
+        }
     }
 
     private initializeStartPoint(ctx: CanvasRenderingContext2D) {
         let cellFound = false;
 
-        while (!cellFound) {
-            const { randomRow, randomCol } = this.generateRandomCellCoordinates();
-            this.cellWithStartPoint = { x: randomCol, y: randomRow };
-            if (this.areStartPointCoordinatesValid(randomRow, randomCol, ctx)) {
-                cellFound = true;
-            }
-        }
+        const { row: randomRow, col: randomCol } = this.generateRandomStartingCellCoordinates();
+        this.cellWithStartPoint = { x: randomRow, y: randomCol };
 
         if (!this.startPoint) {
             this.startPoint = new StartPoint();
@@ -155,89 +155,30 @@ export class Grid {
     }
 
     private blockCellAtStartPoint(ctx: CanvasRenderingContext2D) {
-        const startPipeCoordinates = this.getCellStartPointCoordinates(ctx);
-        if (startPipeCoordinates) {
-            const { row, col } = startPipeCoordinates;
-            this.cells[row][col].setBlocked(true);
-        }
+            const { x, y } = this.cellWithStartPoint!;
+            this.cells[x][y]?.setBlocked(true);
     }
 
-    private areStartPointCoordinatesValid(randomRow: number, randomCol: number, ctx: CanvasRenderingContext2D): boolean {
-        if (this.cells[randomRow][randomCol]?.isBlocked()) {
-            return false;
-        }
-        const neighbors = this.getNeighboringCells(randomRow, randomCol);
-        for (const { row, col } of neighbors) {
-            if (this.isCellBlocked(row, col)) {
-                return this.tryMoveStartPipe(randomRow, randomCol, ctx);
-            }
-        }
-        const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
-        const { x, y } = this.getGridCoordinate(randomRow, randomCol, borderIntervalX, borderIntervalY);
-        this.cellWithStartPoint = { x, y };
-        return true;
-    }
-
-    private tryMoveStartPipe(row: number, col: number, ctx: CanvasRenderingContext2D): boolean {
-        const directions = [
-            { row: row - 1, col },
-            { row: row + 1, col },
-            { row, col: col - 1 },
-            { row, col: col + 1 },
-        ];
-
-        for (const { row: newRow, col: newCol } of directions) {
-            if (this.isValidCell(newRow, newCol) && !this.isCellBlocked(newRow, newCol)) {
-                const neighbors = this.getNeighboringCells(newRow, newCol);
-                const isValidPosition = neighbors.every(({ row, col }) => !this.isCellBlocked(row, col));
-
-                if (isValidPosition) {
-                    const { borderIntervalX, borderIntervalY } = this.getBorderIntervals(ctx);
-                    const { x, y } = this.getGridCoordinate(newRow, newCol, borderIntervalX, borderIntervalY);
-                    this.cellWithStartPoint = { x, y };
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private getNeighboringCells(row: number, col: number): { row: number; col: number }[] {
-        const directions = [
-            { row: -1, col: 0 },
-            { row: 1, col: 0 },
-            { row: 0, col: -1 },
-            { row: 0, col: 1 }
-        ];
-
-        return directions
-            .map(({ row: dRow, col: dCol }) => ({ row: row + dRow, col: col + dCol }))
-            .filter(({ row, col }) => this.isValidCell(row, col));
-    }
-
+   
     public isValidCell(row: number, col: number): Boolean {
         return row >= 0 && row < this.rows && col >= 0 && col < this.cols;
     }
 
-    private isCellBlocked(row: number, col: number): Boolean {
-        if (!this.isValidCell(row, col)) {
-            return true;
-        }
-        return this.cells[row][col]?.isBlocked();
-    }
 
-    private generateRandomCellCoordinates() {
-        const rows = this.cells.length;
-        const cols = this.cells[0].length;
 
-        const randomRow = Math.floor(Math.random() * rows);
-        const randomCol = Math.floor(Math.random() * cols);
+    private generateRandomStartingCellCoordinates(): { row: number, col: number} {
+        const rows = this.cells.length - 2;
+        const cols = this.cells[0].length - 2;
 
-        return { randomRow, randomCol };
+        const randomRow = Math.floor(Math.random() * rows)+1;
+        const randomCol = Math.floor(Math.random() * cols)+1;
+
+        return { row: randomRow, col: randomCol };
     }
 
     // Função para atualizar o estado da célula adjacente e desenhar o water pipe
     public updateAdjacentCellWithWater(ctx: CanvasRenderingContext2D, row: number, col: number): void {
+        debugger;
         const adjacentCoordinates = this.hasAdjacentConnections(row, col);
         if (adjacentCoordinates) {
             const { row: adjRow, col: adjCol } = adjacentCoordinates;
@@ -247,7 +188,8 @@ export class Grid {
         }
     }
 
-    private hasAdjacentConnections(row: number, col: number): { row: number; col: number } | null {
+    public hasAdjacentConnections(row: number, col: number): { row: number; col: number } | null {
+        debugger;
         const currentPipe = this.cells[row][col].getPipe();
         const possibleConnections = currentPipe?.getPossibleConnectionsToAdjacentPipes() || [];
 
@@ -259,12 +201,13 @@ export class Grid {
                 if (adjacentPipe && adjacentPipe.getPipe()) {
                     return { row: adjacentCellPipe[0], col: adjacentCellPipe[1] };
                 }
-            }
+            }       
         }
         return null;
     }
 
-    private getAdjacentCellPipe(row: number, col: number, direction: string): [number, number] | null {
+    public getAdjacentCellPipe(row: number, col: number, direction: string): [number, number] | null {
+        debugger;
         switch (direction) {
             case "top":
                 return row > 0 ? [row - 1, col] : null;
@@ -281,16 +224,6 @@ export class Grid {
 
     public getGridCell(row: number, col: number): Cell {
         return this.cells[row][col];
-    }
-
-    public getCellStartPointCoordinates(ctx: CanvasRenderingContext2D): { row: number; col: number } | null {
-        if (this.cellWithStartPoint) {
-            const { x, y } = this.cellWithStartPoint;
-            const col = Math.floor((x - this.getBorderIntervalX(ctx)) / this.cellSize);
-            const row = Math.floor((y - this.getBorderIntervalY(ctx)) / this.cellSize);
-            return { row, col };
-        }
-        return null;
     }
 }
 
