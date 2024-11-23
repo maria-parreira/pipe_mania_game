@@ -199,24 +199,27 @@ export class Grid {
         const adjacentPipeType = this.cells[adjacentCellRow][adjacentCellCol].getPipe()?.getType();
 
         let waterPipe: Pipe | null = null;
-        switch (direction) {
-            case "up":
-                if(currentPipeType == PipeType.StartUp || currentPipeType == PipeType.Vertical || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomLeft || currentPipeType == PipeType.CurvedTopRight){
-                    waterPipe = new WaterPipe(currentPipeType);
-                }
-            case "down":
-                if(currentPipeType == PipeType.StartDown || currentPipeType == PipeType.Vertical || currentPipeType == PipeType.Cross|| currentPipeType == PipeType.CurvedBottomRight || currentPipeType == PipeType.CurvedTopLeft){
-                    waterPipe = new WaterPipe(adjacentPipeType);
-                }            
-            case "right":
-                if(currentPipeType == PipeType.StartRight || currentPipeType == PipeType.Horizontal || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomRight || currentPipeType == PipeType.CurvedTopRight){
-                    waterPipe = new WaterPipe(adjacentPipeType);
-                }            
-            case "left":
-                if(currentPipeType == PipeType.StartLeft || currentPipeType == PipeType.Horizontal || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomLeft || currentPipeType == PipeType.CurvedTopLeft){
-                    waterPipe = new WaterPipe(adjacentPipeType);
-                }    
+        if( adjacentPipeType != null){
+            switch (direction) {
+                case "up":
+                    if(currentPipeType == PipeType.StartUp || currentPipeType == PipeType.Vertical || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomLeft || currentPipeType == PipeType.CurvedTopRight){
+                        waterPipe = new WaterPipe(adjacentPipeType);
+                    }
+                case "down":
+                    if(currentPipeType == PipeType.StartDown || currentPipeType == PipeType.Vertical || currentPipeType == PipeType.Cross|| currentPipeType == PipeType.CurvedBottomRight || currentPipeType == PipeType.CurvedTopLeft){
+                        waterPipe = new WaterPipe(adjacentPipeType);
+                    }            
+                case "right":
+                    if(currentPipeType == PipeType.StartRight || currentPipeType == PipeType.Horizontal || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomRight || currentPipeType == PipeType.CurvedTopRight){
+                        waterPipe = new WaterPipe(adjacentPipeType);
+                    }            
+                case "left":
+                    if(currentPipeType == PipeType.StartLeft || currentPipeType == PipeType.Horizontal || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomLeft || currentPipeType == PipeType.CurvedTopLeft){
+                        waterPipe = new WaterPipe(adjacentPipeType);
+                    }    
+            }
         }
+        
         if(waterPipe){
             this.cells[row][col].setPipe(waterPipe);
             const { x, y} = this.getCellPosition(adjacentCellRow,adjacentCellCol,ctx);
