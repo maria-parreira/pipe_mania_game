@@ -1,4 +1,5 @@
 ﻿import { Pipe } from "./Pipe";
+import { RegularPipe } from "./RegularPipe";
 
 /**
  * PipeQueue class manages a queue of Pipe objects.
@@ -50,7 +51,7 @@ export class PipeQueue {
     });
   }
   public generatePipe(): Pipe {
-    return new Pipe();
+    return new RegularPipe();
   }
 
   public getFirstPipe(): Pipe {

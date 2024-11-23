@@ -14,7 +14,6 @@ export class Cell {
     private pipe: Pipe | null; 
     private blocked: boolean;
     private image: HTMLImageElement = images.bgcell;
-    private waterFlow: WaterPipe | null = null;
 
     constructor(row: number, col: number, size:number, blocked: boolean) {
         this.row = row;
@@ -22,7 +21,6 @@ export class Cell {
         this.size = size;
         this.pipe = null; 
         this.blocked = blocked; 
-        this.waterFlow = null;
     }
 
     public getPipe(): Pipe | null {
@@ -39,11 +37,6 @@ export class Cell {
 
     public setBlocked(blocked: boolean): void {
         this.blocked = blocked; 
-    }
-
-    public fillPipeWithWater(ctx: CanvasRenderingContext2D){
-        this.waterFlow?.fillWithWater();
-        this.waterFlow?.drawWaterPipe(ctx, this.row, this.col, this.size);
     }
 
     public getRow():number {

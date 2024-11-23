@@ -1,51 +1,19 @@
 ﻿import { waterImages } from "../configuration/gameConfiguration";
-import { Pipe, PipeType } from "./Pipe";
+import { Pipe } from "./Pipe";
 import { Grid } from "./Grid";
+import { PipeType } from "./PipeType";
 
-export class WaterPipe {
-  private pipe: Pipe;
-  private grid : Grid;
-  private ctx: CanvasRenderingContext2D;
+export class WaterPipe implements Pipe {
+  private images: HTMLImageElement[];
+  private type: PipeType;
 
-  constructor(pipe: Pipe, grid: Grid, ctx: CanvasRenderingContext2D) {
-    this.pipe = pipe;
-    this.grid = grid;
-    this.ctx = ctx;
+  constructor(type: PipeType) {
+    this.type = type;
+    this.images = this.getImagesByType(this.type);
   }
 
-  public drawWaterPipe(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
-    let images: HTMLImageElement[];
-    switch (this.pipe.getType()) {
-      case "horizontal":
-        images = [waterImages.horizontal33, waterImages.horizontal66, waterImages.horizontal100]
-        this.drawFillingPipeWithWater(ctx, x, y, size, images);
-        break;
-      case "vertical":
-        images = [waterImages.vertical33, waterImages.vertical66, waterImages.vertical100]
-        break;
-      case "curvedBottomRight":
-        images = [waterImages.curvedTopBR33, waterImages.curvedTopBR66, waterImages.curvedTopBR100]
-        this.drawFillingPipeWithWater(ctx, x, y, size, images);
-        break;
-      case "curvedBottomLeft":
-        images = [waterImages.curvedBottomTR33, waterImages.curvedBottomTR66, waterImages.curvedBottomTR100]
-        this.drawFillingPipeWithWater(ctx, x, y, size, images);
-        break;
-      case "curvedTopRight":
-        images = [waterImages.curvedTopBL33, waterImages.curvedTopBL66, waterImages.curvedTopBL100]
-        this.drawFillingPipeWithWater(ctx, x, y, size, images);
-        break;
-      case "curvedTopLeft":
-        images = [waterImages.curvedTopBL33, waterImages.curvedTopBL66, waterImages.curvedTopBL100]
-        this.drawFillingPipeWithWater(ctx, x, y, size, images);
-        break;
-      case "cross":
-        images = [waterImages.cross33H, waterImages.cross66H, waterImages.cross100H]
-        this.drawFillingPipeWithWater(ctx, x, y, size, images);
-        break;
-      default:
-        throw new Error("invalid pipe type");
-    }
+  public draw(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+    this.drawFillingPipeWithWater(ctx, x, y, size, this.images)
   }
 
   private drawFillingPipeWithWater(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, images: HTMLImageElement[] ){
@@ -58,15 +26,30 @@ export class WaterPipe {
         setTimeout(draw, 500);
       }
     };
-
-    draw();
   }
 
-  public fillWithWater(){
-    this.pipe.getContainsWater();
+  private getImagesByType(type: PipeType): HTMLImageElement[] {
+    switch (type) {
+      case "horizontal":
+        return [waterImages.horizontal33,waterImages.horizontal66,waterImages.horizontal100];
+      case "vertical":
+        return [waterImages.vertical33,waterImages.vertical66,waterImages.vertical100];
+      case "curvedBottomRight":
+        return [waterImages.horizontal33,waterImages.horizontal66,waterImages.horizontal100];
+      case "curvedBottomLeft":
+        return [waterImages.horizontal33,waterImages.horizontal66,waterImages.horizontal100];
+      case "curvedTopRight":
+        return [waterImages.horizontal33,waterImages.horizontal66,waterImages.horizontal100];
+      case "curvedTopLeft":
+        return [waterImages.horizontal33,waterImages.horizontal66,waterImages.horizontal100];
+      case "cross":
+        return [waterImages.horizontal33,waterImages.horizontal66,waterImages.horizontal100];
+      default:
+        throw new Error("invalid pipe type");
+    }
   }
 
-  
-
-
+  public getType(): PipeType {
+    return this.type;
+  }
 }

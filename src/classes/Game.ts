@@ -56,7 +56,7 @@ export class Game {
         this.stopCountdown(); // Para o temporizador quando chega a 0
         this.startWaterFlow()
       }
-    }, 1000); // Intervalo de 1 segundo
+    }, 1000);
   }
 
   private stopCountdown() {
@@ -68,17 +68,10 @@ export class Game {
 
   private startWaterFlow() {
     debugger;
-    const startPipeCoordinates = this.grid.getCellWithStartPoint();
-    const row = startPipeCoordinates?.y!;
-    const col = startPipeCoordinates?.x!;
-    this.grid.updateAdjacentCellWithWater(this.ctx, row, col);
-    const adjacentCellCoordinates = this.grid.hasAdjacentConnections(row, col);
-    const adjacentCell = this.grid.getGridCell(adjacentCellCoordinates?.row ?? 0, adjacentCellCoordinates?.col ?? 0);
-    const pipe = adjacentCell.getPipe();
-    if (pipe) {
-        const waterPipe = new WaterPipe(pipe, this.grid, this.ctx);
-        waterPipe.drawWaterPipe;
-    }
+    const startPipeCoordinates = this.grid.getInitialPipePosition();
+    const row = startPipeCoordinates?.row!;
+    const col = startPipeCoordinates?.col!;
+    this.grid.updateAdjacentCellsWithWater(this.ctx, row, col);
   }
 
 
@@ -103,7 +96,7 @@ export class Game {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.grid.draw(this.ctx);
-    this.grid.drawStartPoint(this.ctx, 50);
+    this.grid.drawInitialPipe(this.ctx, 50);
     this.pipeQueue.drawPipeQueue(this.ctx, 10, 150);
 
     this.drawHUD();
@@ -119,50 +112,6 @@ export class Game {
     );
     this.ctx.fillText(`Score: ${this.score}`, 10, 50);
   }
-
-
-  private inspectSurroundingCells(row: number, col: number) {
-    const currentCell = this.grid.getGridCell(row, col);
-    const currentPipe = currentCell.getPipe();
-
-    if (currentPipe) {
-      const possibleDirections = currentPipe.getPossibleConnectionsToAdjacentPipes(); // Obtém as direções possíveis do pipe atual
-
-      possibleDirections.forEach(direction => {
-        let newRow = row;
-        let newCol = col;
-
-        // Atualiza as coordenadas com base na direção
-        switch (direction) {
-          case 'top':
-            newRow -= 1;
-            break;
-          case 'bottom':
-            newRow += 1;
-            break;
-          case 'right':
-            newCol -= 1;
-            break;
-          case 'left':
-            newCol += 1;
-            break;
-        }
-
-        if (this.grid.isValidCell(newRow, newCol)) {
-          const adjacentCell = this.grid.getGridCell(newRow, newCol);
-          const adjacentPipe = adjacentCell.getPipe();
-
-          if (adjacentPipe) {
-            const adjacentPossibleDirections = adjacentPipe.getPossibleConnectionsToAdjacentPipes();
-            if (adjacentPossibleDirections.includes(direction)) {
-              console.log(`Célula adjacente com pipe alinhado encontrada em: (${newRow}, ${newCol})`);
-            }
-          }
-        }
-      });
-    }
-  }
-
 
   private addEventListeners() {
     this.canvas.addEventListener("click", this.handleGridClick.bind(this));
@@ -195,8 +144,5 @@ export class Game {
       this.pipeQueue.addLast(newPipe);
     }
   }
-
-
-
 
 }

@@ -1,4 +1,6 @@
-﻿export const GameConfiguration = {
+﻿import { PipeType } from "@/classes/PipeType";
+
+export const GameConfiguration = {
   rows: 7,
   cols: 9,
   cellSize: 50,
@@ -13,7 +15,7 @@ const loadImages = (imagePaths: { [key: string]: string }) => {
   const images: { [key: string]: HTMLImageElement } = {};
   for (const [key, path] of Object.entries(imagePaths)) {
     const img = new Image();
-    img.src = path;
+    img.src = path as string;
     images[key] = img;
   }
   return images;
@@ -115,8 +117,8 @@ export const images = loadImages(imagePaths);
 
 // Carregue imagens de início separadamente
 export const startImages = loadImages({
-  startup: 'src/assets/start/startUp.png',
-  startdown: 'src/assets/start/startDown.png',
-  startleft: 'src/assets/start/startLeft.png',
-  startright: 'src/assets/start/startRight.png',
+  StartLeft: 'src/assets/start/startLeft.png',
+  StartRight: 'src/assets/start/startRight.png',
+  StartUp: 'src/assets/start/startUp.png',
+  StartDown: 'src/assets/start/startDown.png',
 });
