@@ -147,8 +147,6 @@ export class Grid {
     }
 
     private initializeInitialPipe(ctx: CanvasRenderingContext2D) {
-        let cellFound = false;
-
         this.initialPipePosition = this.generateRandomStartingCellCoordinates();
 
         if (!this.initialPipe) {
@@ -177,11 +175,11 @@ export class Grid {
 
     // Função para atualizar o estado da célula adjacente e desenhar o water pipe
     public updateAdjacentCellsWithWater(ctx: CanvasRenderingContext2D, row: number, col: number): void {
-        debugger;
         this.updateAdjacentConnections(ctx, row, col);
     }
 
     private updateAdjacentConnections(ctx: CanvasRenderingContext2D, row: number, col: number): void {
+        debugger;
         const possibleConnections = this.getPossibleConnectionsToAdjacentPipes(this.cells[row][col]) || [];
 
         for (const cell of possibleConnections) {
@@ -202,7 +200,6 @@ export class Grid {
         if (this.arePipesCompatible(currentPipe, adjacentPipe, direction)) {
 
             const waterPipe = new WaterPipe(adjacentPipe!.getType()); // Garantimos que o adjacente é válido aqui
-            this.cells[adjacentCellRow][adjacentCellCol].setPipe(waterPipe);
             this.cells[adjacentCellRow][adjacentCellCol].setPipe(waterPipe);
             waterPipe.fillPipeWithWater()
     
@@ -252,6 +249,7 @@ export class Grid {
         return opposites[direction];
     }
 
+    //CROSS NAO ESTA A DAR AINDA
     private getPossibleConnectionsToAdjacentPipes(currentCell: Cell) {
         debugger;
         const possibleConnections: Cell[] = [];
@@ -332,7 +330,8 @@ export class Grid {
     }
 
     private isValidCell(row: number, col: number): boolean {
-        return !this.cells[row][col].isBlocked() && row >= 0 && row < this.rows && col >= 0 && col < this.cols; 
+        debugger;
+        return row >= 0 && row < this.rows && col >= 0 && col < this.cols && !this.cells[row][col].isBlocked(); 
     }
 
     private containsPipe(row:number, col: number){
