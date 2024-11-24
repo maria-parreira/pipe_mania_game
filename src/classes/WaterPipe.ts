@@ -47,13 +47,13 @@ export class WaterPipe implements Pipe {
       case "vertical":
         return [waterImages.vertical33c, waterImages.vertical66c, waterImages.vertical100];
       case "curvedBottomRight":
-        return [waterImages.curvedBottomTR33c, waterImages.curvedBottomTR33d, waterImages.curvedBottomTR66c, waterImages.curvedBottomTR66d, waterImages.curvedBottomTR100];
+        return [waterImages.curvedTopBR33b, waterImages.curvedTopBR66b, waterImages.curvedTopBR100];
       case "curvedBottomLeft":
-        return [waterImages.curvedBottomTL33c, waterImages.curvedBottomTL66e, waterImages.curvedBottomTL100, waterImages.curvedBottomTL66c, waterImages.curvedBottomTL33e];
-      case "curvedTopRight":
-        return [waterImages.curvedTopBR33b, waterImages.curvedTopBR66d, waterImages.curvedTopBR100, waterImages.curvedTopBR66b];
-      case "curvedTopLeft":
         return [waterImages.curvedTopBL33b, waterImages.curvedTopBL66b, waterImages.curvedTopBL100];
+      case "curvedTopLeft":
+        return [waterImages.curvedBottomTL33b, waterImages.curvedBottomTL66b, waterImages.curvedBottomTL100];
+      case "curvedTopRight":
+        return [waterImages.curvedBottomTR33c, waterImages.curvedBottomTR66, waterImages.curvedBottomTR100];
       case "cross":
         return [waterImages.cross33d, waterImages.cross66e, waterImages.cross100H, waterImages.cross100V];
       default:

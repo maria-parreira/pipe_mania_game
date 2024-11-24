@@ -189,68 +189,67 @@ export class Grid {
         }
     }
 
-
     // refatorar este metodo para devolver coordenadas do pipe 
 
     private updateAdjacentCellWithWaterPipe(ctx: CanvasRenderingContext2D, row: number, col: number, adjacent: Cell): void{
-       debugger;
         const adjacentCellRow = adjacent.getRow();
         const adjacentCellCol = adjacent.getCol();
 
         const direction = this.getDirection(adjacentCellRow, adjacentCellCol, row, col);
-        const currentPipeType = this.cells[row][col].getPipe()?.getType();
-        const adjacentPipeType = this.cells[adjacentCellRow][adjacentCellCol].getPipe()?.getType();
-
-        let waterPipe: WaterPipe | null = null;
-
-        if( adjacentPipeType != null){
-            switch (direction) {
-                case "up":
-                    if(currentPipeType == PipeType.StartUp || currentPipeType == PipeType.Vertical || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomLeft || currentPipeType == PipeType.CurvedBottomRight){
-                        waterPipe = new WaterPipe(adjacentPipeType);
-                    }
-                    break;
-                case "down":
-                    if(currentPipeType == PipeType.StartDown || currentPipeType == PipeType.Vertical || currentPipeType == PipeType.Cross|| currentPipeType == PipeType.CurvedTopRight || currentPipeType == PipeType.CurvedTopLeft){
-                        waterPipe = new WaterPipe(adjacentPipeType);
-                    }     
-                    break;       
-                case "right":
-                    if(currentPipeType == PipeType.StartRight || currentPipeType == PipeType.Horizontal || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomRight || currentPipeType == PipeType.CurvedTopRight){
-                        waterPipe = new WaterPipe(adjacentPipeType);
-                    }            
-                    break;
-                case "left":
-                    if(currentPipeType == PipeType.StartLeft || currentPipeType == PipeType.Horizontal || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomLeft || currentPipeType == PipeType.CurvedTopLeft){
-                        waterPipe = new WaterPipe(adjacentPipeType);
-                    }    
-                    break;
-            }
-        }
+        const currentPipe = this.cells[row][col].getPipe();
+        const adjacentPipe = this.cells[adjacentCellRow][adjacentCellCol].getPipe();
         
-        if(waterPipe){
-            this.cells[adjacentCellRow][adjacentCellCol].setPipe(waterPipe);
-            const { x, y} = this.getCellPosition(adjacentCellRow,adjacentCellCol,ctx);
-            waterPipe.fillPipeWithWater()
-        }
-        //this.updateAdjacentCellsWithWater(ctx, adjacentCellRow, adjacentCellCol);
+        if (this.arePipesCompatible(currentPipe, adjacentPipe, direction)) {
 
+            const waterPipe = new WaterPipe(adjacentPipe!.getType()); // Garantimos que o adjacente é válido aqui
+            this.cells[adjacentCellRow][adjacentCellCol].setPipe(waterPipe);
+            this.cells[adjacentCellRow][adjacentCellCol].setPipe(waterPipe);
+            waterPipe.fillPipeWithWater()
+    
+            this.updateAdjacentCellsWithWater(ctx, adjacentCellRow, adjacentCellCol);
+        }
     }
 
-    private getDirection(adjacentCellRow: number, adjacentCellCol: number, row:number, col:number): String{
-        if(adjacentCellRow - row < 0){
-            return "up";
-        }
-        else if(adjacentCellRow - row > 0){
-            return "down";
-        }
-        else if(adjacentCellCol - col > 0){
-            return "right";
-        }
-        else if(adjacentCellRow - row < 0){
-            return"left";
-        }
+        // Novo método para verificar compatibilidade entre pipes
+    private arePipesCompatible(currentPipe: Pipe | null, adjacentPipe: Pipe | null, direction: string): boolean {
+        if (!currentPipe || !adjacentPipe) return false;
+    
+        const compatibilityMap: Record<PipeType, Record<string, boolean>> = {
+            [PipeType.Vertical]: { up: true, down: true },
+            [PipeType.Horizontal]: { left: true, right: true },
+            [PipeType.Cross]: { up: true, down: true, left: true, right: true },
+            [PipeType.CurvedBottomLeft]: { up: false, down: true, left: true, right: false },
+            [PipeType.CurvedBottomRight]: { up: false, down: true, left: false, right: true },
+            [PipeType.CurvedTopLeft]: { up: true, down: false, left: true, right: false },
+            [PipeType.CurvedTopRight]: { up: true, down: false, left: false, right: true },
+            [PipeType.StartUp]: { up: true },
+            [PipeType.StartDown]: { down: true },
+            [PipeType.StartLeft]: { left: true },
+            [PipeType.StartRight]: { right: true }
+        };
+    
+        // Verifica se a direção é compatível no pipe atual e no pipe adjacente
+        return compatibilityMap[currentPipe.getType()]?.[direction] && 
+                compatibilityMap[adjacentPipe.getType()]?.[this.getOppositeDirection(direction)];
+    }
+
+
+    private getDirection(adjacentCellRow: number, adjacentCellCol: number, row: number, col: number): string {
+        if (adjacentCellRow < row) return "up";
+        if (adjacentCellRow > row) return "down";
+        if (adjacentCellCol > col) return "right";
+        if (adjacentCellCol < col) return "left";
         return "";
+    }
+        
+    private getOppositeDirection(direction: string): string {
+        const opposites: Record<string, string> = {
+            up: "down",
+            down: "up",
+            left: "right",
+            right: "left"
+        };
+        return opposites[direction];
     }
 
     private getPossibleConnectionsToAdjacentPipes(currentCell: Cell) {
@@ -290,6 +289,42 @@ export class Grid {
             }
             if (this.isValidCell(row, col - 1) && this.containsPipe(row, col - 1)) {
                 possibleConnections.push(this.cells[row][col - 1]);
+            }
+        }
+        else if (currentPipeType === PipeType.CurvedBottomLeft) {
+            // Verifica conexões para CurvedBottomLeft
+            if (this.isValidCell(row + 1, col) && this.containsPipe(row + 1, col)) {
+                possibleConnections.push(this.cells[row + 1][col]); // Conexão para baixo
+            }
+            if (this.isValidCell(row, col - 1) && this.containsPipe(row, col - 1)) {
+                possibleConnections.push(this.cells[row][col - 1]); // Conexão para a esquerda
+            }
+        } 
+        else if (currentPipeType === PipeType.CurvedBottomRight) {
+            // Verifica conexões para CurvedBottomRight
+            if (this.isValidCell(row + 1, col) && this.containsPipe(row + 1, col)) {
+                possibleConnections.push(this.cells[row + 1][col]); // Conexão para baixo
+            }
+            if (this.isValidCell(row, col + 1) && this.containsPipe(row, col + 1)) {
+                possibleConnections.push(this.cells[row][col + 1]); // Conexão para a direita
+            }
+        } 
+        else if (currentPipeType === PipeType.CurvedTopLeft) {
+            // Verifica conexões para CurvedTopLeft
+            if (this.isValidCell(row - 1, col) && this.containsPipe(row - 1, col)) {
+                possibleConnections.push(this.cells[row - 1][col]); // Conexão para cima
+            }
+            if (this.isValidCell(row, col - 1) && this.containsPipe(row, col - 1)) {
+                possibleConnections.push(this.cells[row][col - 1]); // Conexão para a esquerda
+            }
+        } 
+        else if (currentPipeType === PipeType.CurvedTopRight) {
+            // Verifica conexões para CurvedTopRight
+            if (this.isValidCell(row - 1, col) && this.containsPipe(row - 1, col)) {
+                possibleConnections.push(this.cells[row - 1][col]); // Conexão para cima
+            }
+            if (this.isValidCell(row, col + 1) && this.containsPipe(row, col + 1)) {
+                possibleConnections.push(this.cells[row][col + 1]); // Conexão para a direita
             }
         }
 
