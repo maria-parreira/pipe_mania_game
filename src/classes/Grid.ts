@@ -139,38 +139,58 @@ export class Grid {
 
     public drawInitialPipe(ctx: CanvasRenderingContext2D, cellSize: number) {
         if (!this.initialPipePosition) {
-            this.initializeInitialPipe(ctx);
+            this.initializeInitialPipe();
         }
 
         if (this.initialPipePosition) {
             const { x, y } = this.getCellPosition(this.initialPipePosition.row, this.initialPipePosition.col, ctx);
             this.initialPipe?.draw(ctx, x, y, cellSize);
-            this.blockCellAtInitialPipe(ctx);
+            this.blockCellAtInitialPipe();
         }
     }
 
-    private initializeInitialPipe(ctx: CanvasRenderingContext2D) {
-        this.initialPipePosition = this.generateRandomStartingCellCoordinates();
-
+    private initializeInitialPipe() {
         if (!this.initialPipe) {
             this.initialPipe = new StartPipe();
         }
+
+        this.initialPipePosition = this.generateRandomStartingCellCoordinates(this.initialPipe.getType());
+
 
         const { row, col } = this.initialPipePosition;
         this.cells[row][col].setPipe(this.initialPipe);
     }
 
-    private blockCellAtInitialPipe(ctx: CanvasRenderingContext2D) {
+    private blockCellAtInitialPipe() {
         const { row, col } = this.initialPipePosition!;
         this.cells[row][col]?.setBlocked(true);
     }
 
-    private generateRandomStartingCellCoordinates(): { row: number, col: number } {
+    private generateRandomStartingCellCoordinates(initialPipeType: PipeType): { row: number, col: number } {
         const rows = this.cells.length - 2;
         const cols = this.cells[0].length - 2;
 
-        const randomRow = Math.floor(Math.random() * rows) + 1;
-        const randomCol = Math.floor(Math.random() * cols) + 1;
+        let randomRow = 0;
+        let randomCol = 0;
+
+        while(true){
+            randomRow = Math.floor(Math.random() * rows) + 1;
+            randomCol = Math.floor(Math.random() * cols) + 1;
+
+            if(initialPipeType == PipeType.StartUp && this.cells[randomRow-1][randomCol].isBlocked()){
+                continue;
+            }
+            if(initialPipeType == PipeType.StartLeft && this.cells[randomRow][randomCol-1].isBlocked()){
+                continue;
+            }
+            if(initialPipeType == PipeType.StartDown && this.cells[randomRow+1][randomCol].isBlocked()){
+                continue;
+            }
+            if(initialPipeType == PipeType.StartRight && this.cells[randomRow][randomCol+1].isBlocked()){
+                continue;
+            }
+            break;
+        }
 
         return { row: randomRow, col: randomCol };
     }
@@ -369,6 +389,5 @@ export class Grid {
     public getGridCell(row: number, col: number): Cell {
         return this.cells[row][col];
     }
-
 
 }

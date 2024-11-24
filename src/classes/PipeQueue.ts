@@ -33,6 +33,7 @@ const Queue = <T>() => {
 
 export class PipeQueue {
   static readonly PIPE_SIZE = 50;
+  static readonly QUEUE_SIZE = 5;
   static readonly PIPE_SPACING = 10;
 
   private queue = Queue<Pipe>();
@@ -46,7 +47,7 @@ export class PipeQueue {
   public drawPipeQueue(ctx: CanvasRenderingContext2D, x: number, y: number) {
     this.queue.getItems().forEach((pipe, index) => {
       const pipeY = y + index * (PipeQueue.PIPE_SIZE + PipeQueue.PIPE_SPACING);
-      pipe.draw(ctx, x, pipeY, PipeQueue.PIPE_SPACING);
+      pipe.draw(ctx, x, pipeY, PipeQueue.PIPE_SIZE);
     });
   }
   public generatePipe(): Pipe {

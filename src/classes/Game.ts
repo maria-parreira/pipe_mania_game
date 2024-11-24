@@ -170,7 +170,7 @@ export class Game {
     this.score = 0;
 
     this.grid.reset(); 
-    this.pipeQueue = new PipeQueue(5);
+    this.pipeQueue = new PipeQueue(PipeQueue.QUEUE_SIZE);
 
     this.canvas.replaceWith(this.canvas.cloneNode(true) as HTMLCanvasElement);
     this.canvas = document.querySelector(Game.CANVAS_QUERY_SELECTOR)!;
