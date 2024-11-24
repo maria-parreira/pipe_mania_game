@@ -70,23 +70,6 @@ export class RegularPipe implements Pipe {
     }
   }
 
-  public getPossibleConnectionsToAdjacentPipes(): string[] {
-    switch (this.type) {
-      case PipeType.Horizontal:
-        return ["left", "right"]; 
-      case PipeType.Vertical:
-        return ["top", "bottom"]; 
-      case PipeType.CurvedBottomRight:
-        return ["bottom", "right"]; 
-      case PipeType.CurvedBottomLeft:
-        return ["bottom", "left"]; 
-      case PipeType.Cross:
-        return ["bottom", "top", "right", "left"]; 
-      default:
-        return []; 
-    }
-  }
-
   public getType(): PipeType {
     return this.type;
   }
