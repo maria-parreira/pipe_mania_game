@@ -105,7 +105,7 @@ export const waterImages = loadImages({
   curvedTopBL66b: 'src/assets/waterflow/curvedTop/BL/66b.jpeg',
   curvedTopBL33e: 'src/assets/waterflow/curvedTop/BL/33e.jpeg',
   curvedTopBL33b: 'src/assets/waterflow/curvedTop/BL/33b.jpeg',
-  curvedBottomTR66b: 'src/assets/waterflow/curvedBottom/TR/66b',
+  curvedBottomTR66b: 'src/assets/waterflow/curvedBottom/TR/66b.jpeg',
   curvedBottomTR100: 'src/assets/waterflow/curvedBottom/TR/100.jpeg',
   curvedBottomTR66c: 'src/assets/waterflow/curvedBottom/TR/66c.jpeg',
   curvedBottomTR33d: 'src/assets/waterflow/curvedBottom/TR/33d.jpeg',

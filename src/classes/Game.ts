@@ -1,5 +1,5 @@
 ﻿import { Grid } from "./Grid";
-import { GameConfiguration } from "../configuration/gameConfiguration"; 
+import { GameConfiguration, waterImages } from "../configuration/gameConfiguration"; 
 import { PipeQueue } from "./PipeQueue";
 import { Pipe } from "./Pipe";
 import { WaterPipe } from "./WaterPipe";
@@ -49,13 +49,29 @@ export class Game {
       this.handleGameOver();
     });
   
-    this.addEventListeners();
-    this.startGame(this.ctx);
+    this.preloadImages().then(() => {
+      this.addEventListeners();
+      this.startGame(this.ctx);
+    });
   }
 
   public startGame(ctx:CanvasRenderingContext2D) {
     this.startCountdown(ctx);
     this.runGameLoop();
+  }
+
+  private preloadImages(): Promise<void> {
+    const images = Object.values(waterImages);
+    const promises = images.map(img => {
+        return new Promise<void>((resolve, reject) => {
+            img.onload = () => resolve();
+            img.onerror = () => reject(`Failed to load image: ${img.src}`);
+        });
+    });
+
+    return Promise.all(promises)
+        .then(() => console.log("All images loaded successfully"))
+        .catch(error => console.error(error));
   }
 
   private startCountdown(ctx:CanvasRenderingContext2D) {
