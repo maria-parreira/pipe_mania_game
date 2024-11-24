@@ -47,13 +47,13 @@ export class WaterPipe implements Pipe {
 
 private getImagesByType(type: PipeType, direction: Direction): HTMLImageElement[] {
   debugger;
-  if (type === "horizontal" && direction === "left") {
+  if (type === "horizontal" && direction === "right") {
     return [waterImages.horizontal33e, waterImages.horizontal66e, waterImages.horizontal100];
-  } else if (type === "horizontal" && direction === "right") {
+  } else if (type === "horizontal" && direction === "left") {
     return [waterImages.horizontal33d, waterImages.horizontal66d, waterImages.horizontal100];
-  } else if (type === "vertical" && direction === "up") {
-    return [waterImages.vertical33c, waterImages.vertical66c, waterImages.vertical100];
   } else if (type === "vertical" && direction === "down") {
+    return [waterImages.vertical33c, waterImages.vertical66c, waterImages.vertical100];
+  } else if (type === "vertical" && direction === "up") {
     return [waterImages.vertical33b, waterImages.vertical66b, waterImages.vertical100];
   } else if (type === "curvedBottomRight" && direction === "left") {
     return [waterImages.curvedTopBR33d, waterImages.curvedTopBR66d, waterImages.curvedTopBR100];

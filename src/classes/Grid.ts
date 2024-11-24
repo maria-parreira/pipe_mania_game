@@ -266,84 +266,93 @@ export class Grid {
         const row = currentCell.getRow();
         const col = currentCell.getCol();
         const currentPipeType = currentCell.getPipe()?.getType();
-
-        const adjacentTop: Cell = this.cells[row-1][col];
-        const adjacentBot: Cell = this.cells[row+1][col];
-        const adjacentLeft: Cell = this.cells[row][col-1];
-        const adjacentRight: Cell = this.cells[row][col+1];
         
-        const adjacentCells: Cell[] = [adjacentBot, adjacentTop, adjacentLeft, adjacentRight];
+        const adjacentCells: Record<string, Cell | null> = this.getAdjacentCells(row, col);
             // Verifica a direção com base no tipo do pipe
         if (currentPipeType === PipeType.Horizontal || currentPipeType === PipeType.StartLeft || currentPipeType === PipeType.StartRight) {
             // Procura apenas na mesma linha
-            if (adjacentRight.getPipe() instanceof RegularPipe && this.isValidCell(row, col + 1) && this.containsPipe(row, col + 1)) {
+            if (adjacentCells.adjacentRight?.getPipe() instanceof RegularPipe && this.containsPipe(row, col + 1)) {
                 possibleConnections.push(this.cells[row][col + 1]);
             }
-            if (adjacentLeft.getPipe() instanceof RegularPipe && this.isValidCell(row, col - 1) && this.containsPipe(row, col - 1)) {
+            if (adjacentCells.adjacentLeft?.getPipe() instanceof RegularPipe && this.containsPipe(row, col - 1)) {
                 possibleConnections.push(this.cells[row][col - 1]);
             }
         } else if (currentPipeType === PipeType.Vertical || currentPipeType === PipeType.StartUp || currentPipeType === PipeType.StartDown) {
             // Procura apenas na mesma coluna
-            if (adjacentBot.getPipe() instanceof RegularPipe && this.isValidCell(row + 1, col) && this.containsPipe(row + 1, col)) {
+            if (adjacentCells.adjacentBot?.getPipe() instanceof RegularPipe && this.containsPipe(row + 1, col)) {
                 possibleConnections.push(this.cells[row + 1][col]);
             }
-            if (adjacentTop.getPipe() instanceof RegularPipe && this.isValidCell(row - 1, col) && this.containsPipe(row - 1, col)) {
+            if (adjacentCells.adjacentTop?.getPipe() instanceof RegularPipe && this.containsPipe(row - 1, col)) {
                 possibleConnections.push(this.cells[row - 1][col]);
             }
         } else if (currentPipeType === PipeType.Cross) {
             // Se for um cruzamento, procura em todas as direções
-            if (adjacentBot.getPipe() instanceof RegularPipe && this.isValidCell(row + 1, col) && this.containsPipe(row + 1, col)) {
+            if (adjacentCells.adjacentBot?.getPipe() instanceof RegularPipe && this.containsPipe(row + 1, col)) {
                 possibleConnections.push(this.cells[row + 1][col]);
             }
-            if (adjacentTop.getPipe() instanceof RegularPipe && this.isValidCell(row - 1, col) && this.containsPipe(row - 1, col)) {
+            if (adjacentCells.adjacentTop?.getPipe() instanceof RegularPipe && this.containsPipe(row - 1, col)) {
                 possibleConnections.push(this.cells[row - 1][col]);
             }
-            if (adjacentRight.getPipe() instanceof RegularPipe && this.isValidCell(row, col + 1) && this.containsPipe(row, col + 1)) {
+            if (adjacentCells.adjacentRight?.getPipe() instanceof RegularPipe && this.containsPipe(row, col + 1)) {
                 possibleConnections.push(this.cells[row][col + 1]);
             }
-            if (adjacentLeft.getPipe() instanceof RegularPipe && this.isValidCell(row, col - 1) && this.containsPipe(row, col - 1)) {
+            if (adjacentCells.adjacentLeft?.getPipe() instanceof RegularPipe && this.containsPipe(row, col - 1)) {
                 possibleConnections.push(this.cells[row][col - 1]);
             }
         }
         else if (currentPipeType === PipeType.CurvedBottomLeft) {
             // Verifica conexões para CurvedBottomLeft
-            if (adjacentBot.getPipe() instanceof RegularPipe && this.isValidCell(row + 1, col) && this.containsPipe(row + 1, col)) {
+            if (adjacentCells.adjacentBot?.getPipe() instanceof RegularPipe && this.containsPipe(row + 1, col)) {
                 possibleConnections.push(this.cells[row + 1][col]); // Conexão para baixo
             }
-            if (adjacentLeft.getPipe() instanceof RegularPipe && this.isValidCell(row, col - 1) && this.containsPipe(row, col - 1)) {
+            if (adjacentCells.adjacentLeft?.getPipe() instanceof RegularPipe && this.containsPipe(row, col - 1)) {
                 possibleConnections.push(this.cells[row][col - 1]); // Conexão para a esquerda
             }
         } 
         else if (currentPipeType === PipeType.CurvedBottomRight) {
             // Verifica conexões para CurvedBottomRight
-            if (adjacentBot.getPipe() instanceof RegularPipe && this.isValidCell(row + 1, col) && this.containsPipe(row + 1, col)) {
+            if (adjacentCells.adjacentBot?.getPipe() instanceof RegularPipe && this.containsPipe(row + 1, col)) {
                 possibleConnections.push(this.cells[row + 1][col]); // Conexão para baixo
             }
-            if (adjacentRight.getPipe() instanceof RegularPipe && this.isValidCell(row, col + 1) && this.containsPipe(row, col + 1)) {
+            if (adjacentCells.adjacentRight?.getPipe() instanceof RegularPipe && this.isValidCell(row, col + 1) && this.containsPipe(row, col + 1)) {
                 possibleConnections.push(this.cells[row][col + 1]); // Conexão para a direita
             }
         } 
         else if (currentPipeType === PipeType.CurvedTopLeft) {
             // Verifica conexões para CurvedTopLeft
-            if (adjacentTop.getPipe() instanceof RegularPipe && this.isValidCell(row - 1, col) && this.containsPipe(row - 1, col)) {
+            if (adjacentCells.adjacentTop?.getPipe() instanceof RegularPipe && this.containsPipe(row - 1, col)) {
                 possibleConnections.push(this.cells[row - 1][col]); // Conexão para cima
             }
-            if (adjacentLeft.getPipe() instanceof RegularPipe && this.isValidCell(row, col - 1) && this.containsPipe(row, col - 1)) {
+            if (adjacentCells.adjacentLeft?.getPipe() instanceof RegularPipe && this.containsPipe(row, col - 1)) {
                 possibleConnections.push(this.cells[row][col - 1]); // Conexão para a esquerda
             }
         } 
         else if (currentPipeType === PipeType.CurvedTopRight) {
             // Verifica conexões para CurvedTopRight
-            if (adjacentTop.getPipe() instanceof RegularPipe && this.isValidCell(row - 1, col) && this.containsPipe(row - 1, col)) {
+            if (adjacentCells.adjacentTop?.getPipe() instanceof RegularPipe && this.containsPipe(row - 1, col)) {
                 possibleConnections.push(this.cells[row - 1][col]); // Conexão para cima
             }
-            if (adjacentRight.getPipe() instanceof RegularPipe && this.isValidCell(row, col + 1) && this.containsPipe(row, col + 1)) {
+            if (adjacentCells.adjacentRight?.getPipe() instanceof RegularPipe && this.containsPipe(row, col + 1)) {
                 possibleConnections.push(this.cells[row][col + 1]); // Conexão para a direita
             }
         }
 
 
         return possibleConnections;
+    }
+
+    private getAdjacentCells(row: number, col: number): Record<string, Cell | null>{
+        const top = this.isValidCell(row - 1, col) ? this.cells[row - 1][col] : null;
+        const bot = this.isValidCell(row + 1, col) ? this.cells[row + 1][col] : null;
+        const left = this.isValidCell(row, col - 1) ? this.cells[row][col - 1] : null;
+        const right = this.isValidCell(row, col + 1) ? this.cells[row][col + 1] : null;
+
+        return {
+            adjacentTop: top,
+            adjacentBot: bot,
+            adjacentLeft: left,
+            adjacentRight: right
+        };    
     }
 
     private isValidCell(row: number, col: number): boolean {
