@@ -15,6 +15,10 @@ import { WaterPipe } from "./WaterPipe";
  */
 
 export class Grid {
+    static readonly YELLOW = "yellow";
+    static readonly BLOCKED_CELLS_PERCENTAGE = 0.1;
+    static readonly LINE_WIDTH = 3;
+
     private rows: number;
     private cols: number;
     private cellSize: number;
@@ -37,7 +41,7 @@ export class Grid {
 
     private generateBlockedIndices(): Set<number> {
         const totalCells = this.rows * this.cols;
-        const blockedCount = Math.floor(totalCells * 0.1);
+        const blockedCount = Math.floor(totalCells * Grid.BLOCKED_CELLS_PERCENTAGE);
         const blockedIndices = new Set<number>();
 
         while (blockedIndices.size < blockedCount) {
@@ -127,8 +131,9 @@ export class Grid {
             cell.draw(ctx, x, y, this.cellSize);
         }
 
-        ctx.strokeStyle = "yellow";
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = Grid.YELLOW;
+        ctx.lineWidth = Grid.LINE_WIDTH;
+        
         ctx.strokeRect(x, y, this.cellSize, this.cellSize);
     }
 
@@ -195,6 +200,12 @@ export class Grid {
         }
     }
 
+    public reset() {
+        this.cells.forEach(row => row.forEach(cell => {
+            cell.clearPipe();
+        }));
+    }
+
     private async updateAdjacentCellWithWaterPipe(ctx: CanvasRenderingContext2D, row: number, col: number, adjacent: Cell): Promise<void> {
         const adjacentCellRow = adjacent.getRow();
         const adjacentCellCol = adjacent.getCol();
@@ -215,10 +226,6 @@ export class Grid {
             this.drawCellAndPipe(ctx, adjacentCellRow, adjacentCellCol);
             await this.updateAdjacentCellsWithWater(ctx, adjacentCellRow, adjacentCellCol);
         }
-    }
-
-    private delay(ms: number): Promise<void> {
-        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     private onPipeFilledCallback?: () => void;
@@ -363,9 +370,5 @@ export class Grid {
         return this.cells[row][col];
     }
 
-    public reset() {
-        this.cells.forEach(row => row.forEach(cell => {
-            cell.clearPipe();
-        }));
-    }
+
 }

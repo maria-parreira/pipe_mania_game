@@ -10,24 +10,34 @@ import { WaterPipe } from "./WaterPipe";
  * It manages the game canvas, grid, and pipe queue, and provides methods to start the game and draw the game state.
  */
 export class Game {
-  canvas: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D;
-  grid: Grid;
-  pipeQueue: PipeQueue = new PipeQueue(5);
+  static readonly PIPE_QUEUE_NUMBER = 5;
+  static readonly HUD_FONT = "20px Arial";
+  static readonly HUD_FILL_STYLE = "black";
+  static readonly GAME_OVER_FONT = "40px Arial";
+  static readonly GAME_OVER_FILL_STYLE = "red";
+  static readonly GAME_OVER_TEXT_ALIGN = "center";
+  static readonly CONTEXT = "2d";
+  static readonly CANVAS_QUERY_SELECTOR = "canvas";
+  
+  private canvas: HTMLCanvasElement;
+  private ctx: CanvasRenderingContext2D;
+  
+  private grid: Grid;
+  private pipeQueue: PipeQueue = new PipeQueue(Game.PIPE_QUEUE_NUMBER);
   private selectedPipe: Pipe | null = null;
+  
   private isRunning: boolean = true;
-
   private countdown: number = 20; 
   private timerInterval: number | null = null; 
-
   private score: number = 0; 
+
 
   constructor(
     canvas: HTMLCanvasElement,
     grid: Grid
   ) {
     this.canvas = canvas;
-    this.ctx = canvas.getContext("2d")!;
+    this.ctx = canvas.getContext(Game.CONTEXT)!;
     this.grid = grid;
     this.grid.setOnPipeFilledCallback(() => {
       if (this.countdown === 0) {
@@ -95,8 +105,8 @@ export class Game {
   }
 
   private drawHUD() {
-    this.ctx.font = "20px Arial";
-    this.ctx.fillStyle = "black";
+    this.ctx.font = Game.HUD_FONT;
+    this.ctx.fillStyle = Game.HUD_FILL_STYLE;
     this.ctx.fillText(
       `Time until water: ${this.countdown}s`,
       10,
@@ -145,12 +155,12 @@ export class Game {
   private drawGameOverScreen() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.ctx.font = "40px Arial";
-    this.ctx.fillStyle = "red";
-    this.ctx.textAlign = "center";
+    this.ctx.font = Game.GAME_OVER_FONT;
+    this.ctx.fillStyle = Game.GAME_OVER_FILL_STYLE;
+    this.ctx.textAlign = Game.GAME_OVER_TEXT_ALIGN;
     this.ctx.fillText("Game Over", this.canvas.width / 2, this.canvas.height / 2 - 20);
-    this.ctx.font = "20px Arial";
-    this.ctx.fillStyle = "black";
+    this.ctx.font = Game.HUD_FONT;
+    this.ctx.fillStyle = Game.HUD_FILL_STYLE;
     this.ctx.fillText("Click to Restart", this.canvas.width / 2, this.canvas.height / 2 + 20);
   }
 
@@ -163,8 +173,8 @@ export class Game {
     this.pipeQueue = new PipeQueue(5);
 
     this.canvas.replaceWith(this.canvas.cloneNode(true) as HTMLCanvasElement);
-    this.canvas = document.querySelector("canvas")!;
-    this.ctx = this.canvas.getContext("2d")!;
+    this.canvas = document.querySelector(Game.CANVAS_QUERY_SELECTOR)!;
+    this.ctx = this.canvas.getContext(Game.CONTEXT)!;
     this.grid.setOnGameOverCallback(() => this.handleGameOver());
     this.addEventListeners();
 

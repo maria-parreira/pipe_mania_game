@@ -9,6 +9,8 @@ import { PipeType } from "./PipeType";
  */
 
 export class WaterPipe implements Pipe {
+  static readonly WATER_LEVELS = 3;
+
   private images: HTMLImageElement[];
   private type: PipeType;
   private currentImage: HTMLImageElement | undefined;
@@ -31,7 +33,7 @@ export class WaterPipe implements Pipe {
 
     return new Promise((resolve) => {
       const updateWaterLevel = () => {
-        if (fillLevel < 3) {
+        if (fillLevel < WaterPipe.WATER_LEVELS) {
           this.currentImage = this.images[fillLevel];
           fillLevel++;
           setTimeout(updateWaterLevel, 500);
@@ -48,37 +50,37 @@ export class WaterPipe implements Pipe {
   }
 
   private getImagesByType(type: PipeType, direction: Direction): HTMLImageElement[] {
-    if (type === "horizontal" && direction === "right") {
+    if (type === PipeType.Horizontal && direction === Direction.Right) {
       return [waterImages.horizontal33e, waterImages.horizontal66e, waterImages.horizontal100];
-    } else if (type === "horizontal" && direction === "left") {
+    } else if (type === PipeType.Horizontal && direction === Direction.Left) {
       return [waterImages.horizontal33d, waterImages.horizontal66d, waterImages.horizontal100];
-    } else if (type === "vertical" && direction === "down") {
+    } else if (type === PipeType.Vertical && direction === Direction.Down) {
       return [waterImages.vertical33c, waterImages.vertical66c, waterImages.vertical100];
-    } else if (type === "vertical" && direction === "up") {
+    } else if (type === PipeType.Vertical && direction === Direction.Up) {
       return [waterImages.vertical33b, waterImages.vertical66b, waterImages.vertical100];
-    } else if (type === "curvedBottomRight" && direction === "left") {
+    } else if (type === PipeType.CurvedBottomRight && direction === Direction.Left) {
       return [waterImages.curvedTopBR33d, waterImages.curvedTopBR66d, waterImages.curvedTopBR100];
-    } else if (type === "curvedBottomRight" && direction === "up") {
+    } else if (type === PipeType.CurvedBottomRight && direction === Direction.Up) {
       return [waterImages.curvedTopBR33b, waterImages.curvedTopBR66b, waterImages.curvedTopBR100];
-    } else if (type === "curvedBottomLeft" && direction === "right") {
+    } else if (type === PipeType.CurvedBottomLeft && direction === Direction.Right) {
       return [waterImages.curvedTopBL33e, waterImages.curvedTopBL66e, waterImages.curvedTopBL100];
-    } else if (type === "curvedBottomLeft" && direction === "up") {
+    } else if (type === PipeType.CurvedBottomLeft && direction === Direction.Up) {
       return [waterImages.curvedTopBL33b, waterImages.curvedTopBL66b, waterImages.curvedTopBL100];
-    } else if (type === "curvedTopLeft" && direction === "right") {
+    } else if (type === PipeType.CurvedTopLeft && direction === Direction.Right) {
       return [waterImages.curvedBottomTL33e, waterImages.curvedBottomTL66e, waterImages.curvedBottomTL100];
-    } else if (type === "curvedTopLeft" && direction === "down") {
+    } else if (type === PipeType.CurvedTopLeft && direction === Direction.Down) {
       return [waterImages.curvedBottomTL33c, waterImages.curvedBottomTL66c, waterImages.curvedBottomTL100];
-    } else if (type === "curvedTopRight" && direction === "left") {
+    } else if (type === PipeType.CurvedTopRight && direction === Direction.Left) {
       return [waterImages.curvedBottomTR33d, waterImages.curvedBottomTR66c, waterImages.curvedBottomTR100];
-    } else if (type === "curvedTopRight" && direction === "down") {
+    } else if (type === PipeType.CurvedTopRight && direction === Direction.Down) {
       return [waterImages.curvedBottomTR33c, waterImages.curvedBottomTR66b, waterImages.curvedBottomTR100];
-    } else if (type === "cross" && direction === "up") {
+    } else if (type === PipeType.Cross && direction === Direction.Up) {
       return [waterImages.cross33c, waterImages.cross66c, waterImages.cross100V];
-    } else if (type === "cross" && direction === "down") {
+    } else if (type === PipeType.Cross && direction === Direction.Down) {
       return [waterImages.cross33b, waterImages.cross66b, waterImages.cross100V];
-    } else if (type === "cross" && direction === "left") {
+    } else if (type === PipeType.Cross && direction === Direction.Left) {
       return [waterImages.cross33d, waterImages.cross66d, waterImages.cross100H];
-    } else if (type === "cross" && direction === "right") {
+    } else if (type === PipeType.Cross && direction === Direction.Right) {
       return [waterImages.cross33e, waterImages.cross66e, waterImages.cross100H];
     } else {
       throw new Error("invalid pipe type");

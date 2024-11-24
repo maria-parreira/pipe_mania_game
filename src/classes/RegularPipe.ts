@@ -10,6 +10,8 @@ import { PipeType } from "./PipeType";
  */
 
 export class RegularPipe implements Pipe {
+  static readonly CONTEXT_STROKE_STYLE = "blue";
+  static readonly LINE_WIDTH = 2;
 
   private image: HTMLImageElement;
   private type: PipeType;
@@ -57,8 +59,8 @@ export class RegularPipe implements Pipe {
   public draw(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
     const draw = () => {
       ctx.save(); 
-      ctx.strokeStyle = 'blue'; 
-      ctx.lineWidth = 2; 
+      ctx.strokeStyle = RegularPipe.CONTEXT_STROKE_STYLE; 
+      ctx.lineWidth = RegularPipe.LINE_WIDTH; 
       ctx.strokeRect(x, y, size, size); 
       ctx.drawImage(this.image, x, y, size, size);
       ctx.restore();
