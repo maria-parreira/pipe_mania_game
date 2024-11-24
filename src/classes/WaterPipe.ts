@@ -73,7 +73,7 @@ export class WaterPipe implements Pipe {
     } else if (type === PipeType.CurvedTopRight && direction === Direction.Left) {
       return [waterImages.curvedBottomTR33d, waterImages.curvedBottomTR66c, waterImages.curvedBottomTR100];
     } else if (type === PipeType.CurvedTopRight && direction === Direction.Down) {
-      return [waterImages.curvedBottomTR33c, waterImages.curvedBottomTR66b, waterImages.curvedBottomTR100];
+      return [waterImages.curvedBottomTR33c, waterImages.curvedBottomTR66c, waterImages.curvedBottomTR100];
     } else if (type === PipeType.Cross && direction === Direction.Up) {
       return [waterImages.cross33c, waterImages.cross66c, waterImages.cross100V];
     } else if (type === PipeType.Cross && direction === Direction.Down) {

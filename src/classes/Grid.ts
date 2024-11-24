@@ -221,9 +221,9 @@ export class Grid {
     }
 
     public reset() {
-        this.cells.forEach(row => row.forEach(cell => {
-            cell.clearPipe();
-        }));
+        this.initialPipePosition = null;
+        this.initialPipe = null;
+        this.initializeGrid();
     }
 
     private async updateAdjacentCellWithWaterPipe(ctx: CanvasRenderingContext2D, row: number, col: number, adjacent: Cell): Promise<void> {

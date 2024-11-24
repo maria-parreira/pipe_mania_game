@@ -120,6 +120,9 @@ export const waterImages = loadImages({
   cross66e: 'src/assets/waterflow/cross/66e.jpeg',
   cross33e: 'src/assets/waterflow/cross/33e.jpeg',
   cross33d: 'src/assets/waterflow/cross/33d.jpeg',
+  cross66d: 'src/assets/waterflow/cross/66d.jpeg',
+  cross66b: 'src/assets/waterflow/cross/66b.jpeg',
+  cross33b: 'src/assets/waterflow/cross/66b.jpeg',
   cross33c: 'src/assets/waterflow/cross/33c.jpeg',
   cross66c: 'src/assets/waterflow/cross/66c.jpeg',
 });

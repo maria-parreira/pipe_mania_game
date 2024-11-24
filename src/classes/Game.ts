@@ -93,12 +93,11 @@ export class Game {
   }
 
   private startWaterFlow() {
-    debugger;
-    const startPipeCoordinates = this.grid.getInitialPipePosition();
-    const row = startPipeCoordinates?.row!;
-    const col = startPipeCoordinates?.col!;
-    this.grid.updateAdjacentCellsWithWater(this.ctx, row, col);
-  }
+        const startPipeCoordinates = this.grid.getInitialPipePosition();
+        const row = startPipeCoordinates?.row!;
+        const col = startPipeCoordinates?.col!;
+        this.grid.updateAdjacentCellsWithWater(this.ctx, row, col);
+}
 
   private runGameLoop() {
     const gameLoop = () => {
@@ -181,19 +180,27 @@ export class Game {
   }
 
   private restartGame() {
-    this.isRunning = true;
+    this.isRunning = false;
+    this.stopCountdown();
+
     this.countdown = 20;
     this.score = 0;
 
     this.grid.reset(); 
-    this.pipeQueue = new PipeQueue(PipeQueue.QUEUE_SIZE);
-
+    this.pipeQueue = new PipeQueue(Game.PIPE_QUEUE_NUMBER); 
     this.canvas.replaceWith(this.canvas.cloneNode(true) as HTMLCanvasElement);
     this.canvas = document.querySelector(Game.CANVAS_QUERY_SELECTOR)!;
     this.ctx = this.canvas.getContext(Game.CONTEXT)!;
+
     this.grid.setOnGameOverCallback(() => this.handleGameOver());
+    this.grid.setOnPipeFilledCallback(() => {
+        if (this.countdown === 0) {
+            this.score += 10; 
+        }
+    });
     this.addEventListeners();
 
+    this.isRunning = true;
     this.startGame(this.ctx);
-  }
+}
 }
