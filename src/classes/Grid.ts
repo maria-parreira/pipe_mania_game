@@ -175,37 +175,44 @@ export class Grid {
     }
 
     // Função para atualizar o estado da célula adjacente e desenhar o water pipe
-    public updateAdjacentCellsWithWater(ctx: CanvasRenderingContext2D, row: number, col: number): void {
-        this.updateAdjacentConnections(ctx, row, col);
-    }
-
-    private updateAdjacentConnections(ctx: CanvasRenderingContext2D, row: number, col: number): void {
-        debugger;
+    public async updateAdjacentCellsWithWater(ctx: CanvasRenderingContext2D, row: number, col: number): Promise<void> {
+        // Obtenha as conexões possíveis
         const possibleConnections = this.getPossibleConnectionsToAdjacentPipes(this.cells[row][col]) || [];
-
+    
+        // Processa cada célula adjacente com um atraso
         for (const cell of possibleConnections) {
-            this.updateAdjacentCellWithWaterPipe(ctx,row, col, cell);
+            await this.updateAdjacentCellWithWaterPipe(ctx, row, col, cell);
         }
     }
 
     // refatorar este metodo para devolver coordenadas do pipe 
 
-    private updateAdjacentCellWithWaterPipe(ctx: CanvasRenderingContext2D, row: number, col: number, adjacent: Cell): void{
+    private async updateAdjacentCellWithWaterPipe(ctx: CanvasRenderingContext2D, row: number, col: number, adjacent: Cell): Promise<void> {
         const adjacentCellRow = adjacent.getRow();
         const adjacentCellCol = adjacent.getCol();
-
+    
         const direction = this.getDirection(adjacentCellRow, adjacentCellCol, row, col);
         const currentPipe = this.cells[row][col].getPipe();
         const adjacentPipe = this.cells[adjacentCellRow][adjacentCellCol].getPipe();
-        
+    
         if (this.arePipesCompatible(currentPipe, adjacentPipe, direction)) {
-
             const waterPipe = new WaterPipe(adjacentPipe!.getType()); // Garantimos que o adjacente é válido aqui
             this.cells[adjacentCellRow][adjacentCellCol].setPipe(waterPipe);
-            waterPipe.fillPipeWithWater()
+            await waterPipe.fillPipeWithWater();
     
-            this.updateAdjacentCellsWithWater(ctx, adjacentCellRow, adjacentCellCol);
+            // Redesenhe a célula atual e adjacente
+            this.drawCellAndPipe(ctx, row, col);
+            this.drawCellAndPipe(ctx, adjacentCellRow, adjacentCellCol);
+    
+            // Atraso antes de continuar para o próximo pipe
+            //await this.delay(500); // Atraso de 500ms, ajustável
+            await this.updateAdjacentCellsWithWater(ctx, adjacentCellRow, adjacentCellCol);
         }
+    }
+    
+    // Método auxiliar para criar o atraso
+    private delay(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
         // Novo método para verificar compatibilidade entre pipes

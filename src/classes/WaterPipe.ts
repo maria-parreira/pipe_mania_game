@@ -20,24 +20,26 @@ export class WaterPipe implements Pipe {
     }
   }
 
-  public fillPipeWithWater() {
+  public async fillPipeWithWater(): Promise<void> {
     debugger;
     let fillLevel = 0; // 0: empty, 1: 33%, 2: 66%, 3: 100%
-    
-    const updateWaterLevel = () => {
-      if (fillLevel < 3) { 
-        this.currentImage = this.images[fillLevel];
-        console.log("fill-level = " + fillLevel);
-        console.log("this.image = " + this.currentImage);
-        console.log("this.type = " + this.type);
 
-        fillLevel++;
-        setTimeout(updateWaterLevel, 1000); 
-      }
-    };
+    // Retorna uma Promise que será resolvida após todas as etapas de preenchimento
+    return new Promise((resolve) => {
+        const updateWaterLevel = () => {
+            if (fillLevel < 3) {
+                this.currentImage = this.images[fillLevel];
+                fillLevel++;
+                setTimeout(updateWaterLevel, 500); // Preencher o próximo nível após 1 segundo
+            } else {
+                resolve(); // Resolve a Promise quando o preenchimento estiver completo
+            }
+        };
 
-    updateWaterLevel(); // Iniciar o processo
-  }
+        updateWaterLevel(); // Iniciar o processo
+    });
+}
+
 
 
   private getImagesByType(type: PipeType): HTMLImageElement[] {
