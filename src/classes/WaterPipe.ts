@@ -58,15 +58,15 @@ private getImagesByType(type: PipeType, direction: Direction): HTMLImageElement[
   } else if (type === "curvedBottomRight" && direction === "left") {
     return [waterImages.curvedTopBR33d, waterImages.curvedTopBR66d, waterImages.curvedTopBR100];
   } else if (type === "curvedBottomRight" && direction === "up") {
-    return [waterImages.curvedTopBR33c, waterImages.curvedTopBR66c, waterImages.curvedTopBR100];
+    return [waterImages.curvedTopBR33b, waterImages.curvedTopBR66b, waterImages.curvedTopBR100];
   }else if (type === "curvedBottomLeft"  && direction === "right") {
     return [waterImages.curvedTopBL33e, waterImages.curvedTopBL66e, waterImages.curvedTopBL100];
   } else if (type === "curvedBottomLeft"  && direction === "up") {
-    return [waterImages.curvedTopBL33c, waterImages.curvedTopBL66c, waterImages.curvedTopBL100];
+    return [waterImages.curvedTopBL33b, waterImages.curvedTopBL66b, waterImages.curvedTopBL100];
   }else if (type === "curvedTopLeft" && direction === "right") {
     return [waterImages.curvedBottomTL33e, waterImages.curvedBottomTL66e, waterImages.curvedBottomTL100];
   }else if (type === "curvedTopLeft" && direction === "down") {
-    return [waterImages.curvedBottomTL33b, waterImages.curvedBottomTL66b, waterImages.curvedBottomTL100];
+    return [waterImages.curvedBottomTL33c, waterImages.curvedBottomTL66c, waterImages.curvedBottomTL100];
   } else if (type === "curvedTopRight" && direction === "left") {
     return [waterImages.curvedBottomTR33d, waterImages.curvedBottomTR66d, waterImages.curvedBottomTR100];
   } else if (type === "curvedTopRight" && direction === "down") {
@@ -83,6 +83,7 @@ private getImagesByType(type: PipeType, direction: Direction): HTMLImageElement[
     throw new Error("invalid pipe type");
   }
 }
+
 
 
   public getType(): PipeType {
