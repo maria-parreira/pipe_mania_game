@@ -69,17 +69,17 @@ export class WaterPipe implements Pipe {
     } else if (type === "curvedTopLeft" && direction === "down") {
       return [waterImages.curvedBottomTL33c, waterImages.curvedBottomTL66c, waterImages.curvedBottomTL100];
     } else if (type === "curvedTopRight" && direction === "left") {
-      return [waterImages.curvedBottomTR33d, waterImages.curvedBottomTR66d, waterImages.curvedBottomTR100];
+      return [waterImages.curvedBottomTR33d, waterImages.curvedBottomTR66c, waterImages.curvedBottomTR100];
     } else if (type === "curvedTopRight" && direction === "down") {
-      return [waterImages.curvedBottomTR33b, waterImages.curvedBottomTR66b, waterImages.curvedBottomTR100];
+      return [waterImages.curvedBottomTR33c, waterImages.curvedBottomTR66b, waterImages.curvedBottomTR100];
     } else if (type === "cross" && direction === "up") {
       return [waterImages.cross33c, waterImages.cross66c, waterImages.cross100V];
     } else if (type === "cross" && direction === "down") {
       return [waterImages.cross33b, waterImages.cross66b, waterImages.cross100V];
     } else if (type === "cross" && direction === "left") {
-      return [waterImages.cross33e, waterImages.cross66e, waterImages.cross100H];
-    } else if (type === "cross" && direction === "right") {
       return [waterImages.cross33d, waterImages.cross66d, waterImages.cross100H];
+    } else if (type === "cross" && direction === "right") {
+      return [waterImages.cross33e, waterImages.cross66e, waterImages.cross100H];
     } else {
       throw new Error("invalid pipe type");
     }
