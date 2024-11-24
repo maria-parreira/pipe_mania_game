@@ -10,7 +10,6 @@ import { WaterPipe } from './WaterPipe';
 export class Cell {
     private row: number; 
     private col: number; 
-    private size: number;
     private pipe: Pipe | null; 
     private blocked: boolean;
     private image: HTMLImageElement = images.bgcell;
@@ -18,7 +17,6 @@ export class Cell {
     constructor(row: number, col: number, size:number, blocked: boolean) {
         this.row = row;
         this.col = col;
-        this.size = size;
         this.pipe = null; 
         this.blocked = blocked; 
     }
@@ -55,6 +53,10 @@ export class Cell {
               ctx.drawImage(this.image, x, y, size, size);
             };
           }
+      }
+
+      public clearPipe(){
+        this.pipe = null;
       }
 
 

@@ -1,5 +1,13 @@
-﻿import { PipeType } from "@/classes/PipeType";
-
+﻿/**
+ * Game configuration.
+ * @typedef {Object} GameConfiguration
+ * @property {number} rows - Number of rows in the game.
+ * @property {number} cols - Number of columns in the game.
+ * @property {number} cellSize - Size of each cell.
+ * @property {Object} selectedCell - Selected cell.
+ * @property {number} selectedCell.row - Row of the selected cell.
+ * @property {number} selectedCell.col - Column of the selected cell.
+ */
 export const GameConfiguration = {
   rows: 7,
   cols: 9,
@@ -10,7 +18,9 @@ export const GameConfiguration = {
   },
 };
 
-
+/**
+ * Loads images from an object of image paths.
+ */
 const loadImages = (imagePaths: { [key: string]: string }) => {
   const images: { [key: string]: HTMLImageElement } = {};
   for (const [key, path] of Object.entries(imagePaths)) {
@@ -71,7 +81,9 @@ const imagePaths: { [key: string]: string } = {
   blockedcell:'src/assets/blockedcell.png',
 };
 
-// Carregar imagens de água
+/**
+ * Loaded water images.
+ */
 export const waterImages = loadImages({
   vertical100: 'src/assets/waterflow/vertical/100.jpeg',
   vertical66c: 'src/assets/waterflow/vertical/66c.jpeg',
@@ -110,11 +122,11 @@ export const waterImages = loadImages({
   cross33d: 'src/assets/waterflow/cross/33d.jpeg',
 });
 
-// Carregue todas as imagens
 export const images = loadImages(imagePaths);
 
-
-// Carregue imagens de início separadamente
+/**
+ * Loaded start images.
+ */
 export const startImages = loadImages({
   StartLeft: 'src/assets/start/startLeft.png',
   StartRight: 'src/assets/start/startRight.png',

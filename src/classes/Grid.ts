@@ -15,7 +15,6 @@ import { WaterPipe } from "./WaterPipe";
  */
 
 export class Grid {
-  
     private rows: number;
     private cols: number;
     private cellSize: number;
@@ -74,7 +73,7 @@ export class Grid {
         return ctx.canvas.getBoundingClientRect().y + this.getBorderIntervalY(ctx);
     }
 
-    public getInitialPipePosition(){
+    public getInitialPipePosition() {
         return this.initialPipePosition;
     }
 
@@ -116,7 +115,6 @@ export class Grid {
         }
     }
 
-
     private drawCellAndPipe(ctx: CanvasRenderingContext2D, row: number, col: number) {
         const cell = this.cells[row][col];
         const { x, y } = this.getCellPosition(row, col, ctx);
@@ -141,9 +139,7 @@ export class Grid {
 
         if (this.initialPipePosition) {
             const { x, y } = this.getCellPosition(this.initialPipePosition.row, this.initialPipePosition.col, ctx);
-
             this.initialPipe?.draw(ctx, x, y, cellSize);
-
             this.blockCellAtInitialPipe(ctx);
         }
     }
@@ -155,72 +151,89 @@ export class Grid {
             this.initialPipe = new StartPipe();
         }
 
-        const {row, col} = this.initialPipePosition;
-
-        this.cells[row][col].setPipe(this.initialPipe)
+        const { row, col } = this.initialPipePosition;
+        this.cells[row][col].setPipe(this.initialPipe);
     }
 
     private blockCellAtInitialPipe(ctx: CanvasRenderingContext2D) {
-            const { row, col } = this.initialPipePosition!;
-            this.cells[row][col]?.setBlocked(true);
+        const { row, col } = this.initialPipePosition!;
+        this.cells[row][col]?.setBlocked(true);
     }
 
-    private generateRandomStartingCellCoordinates(): { row: number, col: number} {
+    private generateRandomStartingCellCoordinates(): { row: number, col: number } {
         const rows = this.cells.length - 2;
         const cols = this.cells[0].length - 2;
 
-        const randomRow = Math.floor(Math.random() * rows)+1;
-        const randomCol = Math.floor(Math.random() * cols)+1;
+        const randomRow = Math.floor(Math.random() * rows) + 1;
+        const randomCol = Math.floor(Math.random() * cols) + 1;
 
         return { row: randomRow, col: randomCol };
     }
 
-    // Função para atualizar o estado da célula adjacente e desenhar o water pipe
     public async updateAdjacentCellsWithWater(ctx: CanvasRenderingContext2D, row: number, col: number): Promise<void> {
-        // Obtenha as conexões possíveis
         const possibleConnections = this.getPossibleConnectionsToAdjacentPipes(this.cells[row][col]) || [];
-    
-        // Processa cada célula adjacente com um atraso
+
+        if (possibleConnections.length === 0) {
+            this.notifyGameOver();
+            return;
+        }
+
         for (const cell of possibleConnections) {
             await this.updateAdjacentCellWithWaterPipe(ctx, row, col, cell);
         }
     }
 
+    private onGameOverCallback?: () => void;
 
-    // refatorar este metodo para devolver coordenadas do pipe 
+    public setOnGameOverCallback(callback: () => void) {
+        this.onGameOverCallback = callback;
+    }
+
+    private notifyGameOver() {
+        if (this.onGameOverCallback) {
+            this.onGameOverCallback();
+        }
+    }
 
     private async updateAdjacentCellWithWaterPipe(ctx: CanvasRenderingContext2D, row: number, col: number, adjacent: Cell): Promise<void> {
         const adjacentCellRow = adjacent.getRow();
         const adjacentCellCol = adjacent.getCol();
 
-    
         const direction = this.getDirection(adjacentCellRow, adjacentCellCol, row, col);
         const currentPipe = this.cells[row][col].getPipe();
         const adjacentPipe = this.cells[adjacentCellRow][adjacentCellCol].getPipe();
-    
+
         if (this.arePipesCompatible(currentPipe!, adjacentPipe!, direction!)) {
-            const waterPipe = new WaterPipe(adjacentPipe!.getType(), direction!); // Garantimos que o adjacente é válido aqui
+            const waterPipe = new WaterPipe(adjacentPipe!.getType(), direction!);
             this.cells[adjacentCellRow][adjacentCellCol].setPipe(waterPipe);
 
-            await waterPipe.fillPipeWithWater();
-    
-            // Redesenhe a célula atual e adjacente
+            await waterPipe.fillPipeWithWater(() => {
+                this.notifyPipeFilled();
+            });
+
             this.drawCellAndPipe(ctx, row, col);
             this.drawCellAndPipe(ctx, adjacentCellRow, adjacentCellCol);
-    
-            // Atraso antes de continuar para o próximo pipe
-            //await this.delay(500); // Atraso de 500ms, ajustável
             await this.updateAdjacentCellsWithWater(ctx, adjacentCellRow, adjacentCellCol);
         }
     }
-    
-    // Método auxiliar para criar o atraso
+
     private delay(ms: number): Promise<void> {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-        // Novo método para verificar compatibilidade entre pipes
-    private arePipesCompatible(currentPipe: Pipe, adjacentPipe: Pipe, direction: Direction): boolean {    
+    private onPipeFilledCallback?: () => void;
+
+    public setOnPipeFilledCallback(callback: () => void) {
+        this.onPipeFilledCallback = callback;
+    }
+
+    private notifyPipeFilled() {
+        if (this.onPipeFilledCallback) {
+            this.onPipeFilledCallback();
+        }
+    }
+
+    private arePipesCompatible(currentPipe: Pipe, adjacentPipe: Pipe, direction: Direction): boolean {
         const compatibilityMap: Record<PipeType, Record<string, boolean>> = {
             [PipeType.Vertical]: { up: true, down: true },
             [PipeType.Horizontal]: { left: true, right: true },
@@ -234,12 +247,10 @@ export class Grid {
             [PipeType.StartLeft]: { left: true },
             [PipeType.StartRight]: { right: true }
         };
-    
-        // Verifica se a direção é compatível no pipe atual e no pipe adjacente
-        return compatibilityMap[currentPipe.getType()]?.[direction] && 
-                compatibilityMap[adjacentPipe.getType()]?.[this.getOppositeDirection(direction)];
-    }
 
+        return compatibilityMap[currentPipe.getType()]?.[direction] &&
+            compatibilityMap[adjacentPipe.getType()]?.[this.getOppositeDirection(direction)];
+    }
 
     private getDirection(adjacentCellRow: number, adjacentCellCol: number, row: number, col: number): Direction | null {
         if (adjacentCellRow < row) return Direction.Up;
@@ -248,7 +259,7 @@ export class Grid {
         if (adjacentCellCol < col) return Direction.Left;
         return null;
     }
-        
+
     private getOppositeDirection(direction: string): string {
         const opposites: Record<string, string> = {
             up: Direction.Down,
@@ -259,18 +270,14 @@ export class Grid {
         return opposites[direction];
     }
 
-    //CROSS NAO ESTA A DAR AINDA
     private getPossibleConnectionsToAdjacentPipes(currentCell: Cell) {
-        debugger;
         const possibleConnections: Cell[] = [];
         const row = currentCell.getRow();
         const col = currentCell.getCol();
         const currentPipeType = currentCell.getPipe()?.getType();
-        
+
         const adjacentCells: Record<string, Cell | null> = this.getAdjacentCells(row, col);
-            // Verifica a direção com base no tipo do pipe
         if (currentPipeType === PipeType.Horizontal || currentPipeType === PipeType.StartLeft || currentPipeType === PipeType.StartRight) {
-            // Procura apenas na mesma linha
             if (adjacentCells.adjacentRight?.getPipe() instanceof RegularPipe && this.containsPipe(row, col + 1)) {
                 possibleConnections.push(this.cells[row][col + 1]);
             }
@@ -278,7 +285,6 @@ export class Grid {
                 possibleConnections.push(this.cells[row][col - 1]);
             }
         } else if (currentPipeType === PipeType.Vertical || currentPipeType === PipeType.StartUp || currentPipeType === PipeType.StartDown) {
-            // Procura apenas na mesma coluna
             if (adjacentCells.adjacentBot?.getPipe() instanceof RegularPipe && this.containsPipe(row + 1, col)) {
                 possibleConnections.push(this.cells[row + 1][col]);
             }
@@ -286,7 +292,6 @@ export class Grid {
                 possibleConnections.push(this.cells[row - 1][col]);
             }
         } else if (currentPipeType === PipeType.Cross) {
-            // Se for um cruzamento, procura em todas as direções
             if (adjacentCells.adjacentBot?.getPipe() instanceof RegularPipe && this.containsPipe(row + 1, col)) {
                 possibleConnections.push(this.cells[row + 1][col]);
             }
@@ -299,49 +304,40 @@ export class Grid {
             if (adjacentCells.adjacentLeft?.getPipe() instanceof RegularPipe && this.containsPipe(row, col - 1)) {
                 possibleConnections.push(this.cells[row][col - 1]);
             }
-        }
-        else if (currentPipeType === PipeType.CurvedBottomLeft) {
-            // Verifica conexões para CurvedBottomLeft
+        } else if (currentPipeType === PipeType.CurvedBottomLeft) {
             if (adjacentCells.adjacentBot?.getPipe() instanceof RegularPipe && this.containsPipe(row + 1, col)) {
-                possibleConnections.push(this.cells[row + 1][col]); // Conexão para baixo
+                possibleConnections.push(this.cells[row + 1][col]);
             }
             if (adjacentCells.adjacentLeft?.getPipe() instanceof RegularPipe && this.containsPipe(row, col - 1)) {
-                possibleConnections.push(this.cells[row][col - 1]); // Conexão para a esquerda
+                possibleConnections.push(this.cells[row][col - 1]);
             }
-        } 
-        else if (currentPipeType === PipeType.CurvedBottomRight) {
-            // Verifica conexões para CurvedBottomRight
+        } else if (currentPipeType === PipeType.CurvedBottomRight) {
             if (adjacentCells.adjacentBot?.getPipe() instanceof RegularPipe && this.containsPipe(row + 1, col)) {
-                possibleConnections.push(this.cells[row + 1][col]); // Conexão para baixo
+                possibleConnections.push(this.cells[row + 1][col]);
             }
             if (adjacentCells.adjacentRight?.getPipe() instanceof RegularPipe && this.isValidCell(row, col + 1) && this.containsPipe(row, col + 1)) {
-                possibleConnections.push(this.cells[row][col + 1]); // Conexão para a direita
+                possibleConnections.push(this.cells[row][col + 1]);
             }
-        } 
-        else if (currentPipeType === PipeType.CurvedTopLeft) {
-            // Verifica conexões para CurvedTopLeft
+        } else if (currentPipeType === PipeType.CurvedTopLeft) {
             if (adjacentCells.adjacentTop?.getPipe() instanceof RegularPipe && this.containsPipe(row - 1, col)) {
-                possibleConnections.push(this.cells[row - 1][col]); // Conexão para cima
+                possibleConnections.push(this.cells[row - 1][col]);
             }
             if (adjacentCells.adjacentLeft?.getPipe() instanceof RegularPipe && this.containsPipe(row, col - 1)) {
-                possibleConnections.push(this.cells[row][col - 1]); // Conexão para a esquerda
+                possibleConnections.push(this.cells[row][col - 1]);
             }
-        } 
-        else if (currentPipeType === PipeType.CurvedTopRight) {
-            // Verifica conexões para CurvedTopRight
+        } else if (currentPipeType === PipeType.CurvedTopRight) {
             if (adjacentCells.adjacentTop?.getPipe() instanceof RegularPipe && this.containsPipe(row - 1, col)) {
-                possibleConnections.push(this.cells[row - 1][col]); // Conexão para cima
+                possibleConnections.push(this.cells[row - 1][col]);
             }
             if (adjacentCells.adjacentRight?.getPipe() instanceof RegularPipe && this.containsPipe(row, col + 1)) {
-                possibleConnections.push(this.cells[row][col + 1]); // Conexão para a direita
+                possibleConnections.push(this.cells[row][col + 1]);
             }
         }
-
 
         return possibleConnections;
     }
 
-    private getAdjacentCells(row: number, col: number): Record<string, Cell | null>{
+    private getAdjacentCells(row: number, col: number): Record<string, Cell | null> {
         const top = this.isValidCell(row - 1, col) ? this.cells[row - 1][col] : null;
         const bot = this.isValidCell(row + 1, col) ? this.cells[row + 1][col] : null;
         const left = this.isValidCell(row, col - 1) ? this.cells[row][col - 1] : null;
@@ -352,20 +348,24 @@ export class Grid {
             adjacentBot: bot,
             adjacentLeft: left,
             adjacentRight: right
-        };    
+        };
     }
 
     private isValidCell(row: number, col: number): boolean {
-        debugger;
-        return row >= 0 && row < this.rows && col >= 0 && col < this.cols && !this.cells[row][col].isBlocked(); 
+        return row >= 0 && row < this.rows && col >= 0 && col < this.cols && !this.cells[row][col].isBlocked();
     }
 
-    private containsPipe(row:number, col: number){
+    private containsPipe(row: number, col: number) {
         return this.cells[row][col].getPipe();
     }
 
     public getGridCell(row: number, col: number): Cell {
         return this.cells[row][col];
     }
-}
 
+    public reset() {
+        this.cells.forEach(row => row.forEach(cell => {
+            cell.clearPipe();
+        }));
+    }
+}

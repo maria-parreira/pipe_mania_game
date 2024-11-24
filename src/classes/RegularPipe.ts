@@ -5,8 +5,7 @@ import { PipeType } from "./PipeType";
 
 /**
  * Represents a Pipe in the game.
- * This class handles the pipe's images, random type selection,
- * and drawing the pipe on the canvas.
+ * This class handles the pipe's images, random type selection, and drawing the pipe on the canvas.
  * Includes start pipe, end pipe, and water in the pipe.
  */
 

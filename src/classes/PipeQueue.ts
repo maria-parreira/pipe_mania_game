@@ -2,9 +2,8 @@
 import { RegularPipe } from "./RegularPipe";
 
 /**
- * PipeQueue class manages a queue of Pipe objects.
- * It provides methods to add, remove, and retrieve pipes,
- * as well as to draw the queue on a canvas.
+ * PipeQueue class manages a queue of Regular Pipe objects.
+ * It provides methods to add, remove, and retrieve pipes, as well as to draw the queue on a canvas.
  */
 
 const Queue = <T>() => {

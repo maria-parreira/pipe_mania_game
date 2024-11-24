@@ -6,13 +6,9 @@ import { WaterPipe } from "./WaterPipe";
 
 
 /**
- * The Game class represents the main game logic and rendering.
- * It manages the game canvas, grid, and pipe queue, and handles user interactions.
- * 
- * It initializes the game with a given canvas and grid, sets up event listeners for user input,
- * and provides methods to start the game and draw the game state on the canvas.
+ * The Game class handles the main game logic, rendering, and user interactions.
+ * It manages the game canvas, grid, and pipe queue, and provides methods to start the game and draw the game state.
  */
-
 export class Game {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -21,10 +17,10 @@ export class Game {
   private selectedPipe: Pipe | null = null;
   private isRunning: boolean = true;
 
-  private countdown: number = 20; // Tempo restante para a água começar
-  private timerInterval: number | null = null; // Referência para o intervalo do temporizador
+  private countdown: number = 20; 
+  private timerInterval: number | null = null; 
 
-  private score: number = 0; // Pontuação do jogador
+  private score: number = 0; 
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -33,12 +29,22 @@ export class Game {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.grid = grid;
+    this.grid.setOnPipeFilledCallback(() => {
+      if (this.countdown === 0) {
+          this.score += 10; 
+      }
+    });
+
+    this.grid.setOnGameOverCallback(() => {
+      this.handleGameOver();
+    });
+  
     this.addEventListeners();
     this.startGame(this.ctx);
   }
 
   public startGame(ctx:CanvasRenderingContext2D) {
-    this.startCountdown(ctx); // Inicia o temporizador de contagem regressiva
+    this.startCountdown(ctx);
     this.runGameLoop();
   }
 
@@ -47,15 +53,15 @@ export class Game {
       if (this.countdown > 0) {
         this.countdown--; 
       } else {
-        this.stopCountdown(); // Para o temporizador quando chega a 0
-        this.startWaterFlow()
+        this.stopCountdown();
+        this.startWaterFlow();
       }
     }, 1000);
   }
 
   private stopCountdown() {
     if (this.timerInterval !== null) {
-      clearInterval(this.timerInterval); // Para o intervalo
+      clearInterval(this.timerInterval);
       this.timerInterval = null;
     }
   }
@@ -67,7 +73,6 @@ export class Game {
     const col = startPipeCoordinates?.col!;
     this.grid.updateAdjacentCellsWithWater(this.ctx, row, col);
   }
-
 
   private runGameLoop() {
     const gameLoop = () => {
@@ -115,8 +120,6 @@ export class Game {
         this.handlePipeSelection();
         if (this.selectedPipe) {
           this.grid.setPipeInCell(row, col, this.selectedPipe);
-
-          this.score += 10; 
         }
       }
     }
@@ -132,4 +135,39 @@ export class Game {
     }
   }
 
+  private handleGameOver() {
+    this.isRunning = false;
+    this.drawGameOverScreen();
+    
+    this.canvas.addEventListener("click", this.restartGame.bind(this), { once: true });
+  }
+
+  private drawGameOverScreen() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.ctx.font = "40px Arial";
+    this.ctx.fillStyle = "red";
+    this.ctx.textAlign = "center";
+    this.ctx.fillText("Game Over", this.canvas.width / 2, this.canvas.height / 2 - 20);
+    this.ctx.font = "20px Arial";
+    this.ctx.fillStyle = "black";
+    this.ctx.fillText("Click to Restart", this.canvas.width / 2, this.canvas.height / 2 + 20);
+  }
+
+  private restartGame() {
+    this.isRunning = true;
+    this.countdown = 20;
+    this.score = 0;
+
+    this.grid.reset(); 
+    this.pipeQueue = new PipeQueue(5);
+
+    this.canvas.replaceWith(this.canvas.cloneNode(true) as HTMLCanvasElement);
+    this.canvas = document.querySelector("canvas")!;
+    this.ctx = this.canvas.getContext("2d")!;
+    this.grid.setOnGameOverCallback(() => this.handleGameOver());
+    this.addEventListeners();
+
+    this.startGame(this.ctx);
+  }
 }

@@ -1,7 +1,11 @@
 ﻿import { startImages } from "../configuration/gameConfiguration";
-import { Direction } from "./Direction";
 import { Pipe } from "./Pipe";
 import { PipeType } from "./PipeType";
+
+/**
+ * Represents a starting pipe in the game.
+ * This class handles the type and image of the starting pipe, and provides methods to draw it on the canvas.
+ */
 
 export class StartPipe implements Pipe {
 
