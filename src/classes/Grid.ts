@@ -189,6 +189,9 @@ export class Grid {
         }
     }
 
+
+    // refatorar este metodo para devolver coordenadas do pipe 
+
     private updateAdjacentCellWithWaterPipe(ctx: CanvasRenderingContext2D, row: number, col: number, adjacent: Cell): void{
        debugger;
         const adjacentCellRow = adjacent.getRow();
@@ -199,28 +202,29 @@ export class Grid {
         const adjacentPipeType = this.cells[adjacentCellRow][adjacentCellCol].getPipe()?.getType();
 
         let waterPipe: WaterPipe | null = null;
+
         if( adjacentPipeType != null){
             switch (direction) {
                 case "up":
-                    if(currentPipeType == PipeType.StartUp || currentPipeType == PipeType.Vertical || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomLeft || currentPipeType == PipeType.CurvedTopRight){
+                    if(currentPipeType == PipeType.StartUp || currentPipeType == PipeType.Vertical || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomLeft || currentPipeType == PipeType.CurvedBottomRight){
                         waterPipe = new WaterPipe(adjacentPipeType);
-                        break;
                     }
+                    break;
                 case "down":
-                    if(currentPipeType == PipeType.StartDown || currentPipeType == PipeType.Vertical || currentPipeType == PipeType.Cross|| currentPipeType == PipeType.CurvedBottomRight || currentPipeType == PipeType.CurvedTopLeft){
+                    if(currentPipeType == PipeType.StartDown || currentPipeType == PipeType.Vertical || currentPipeType == PipeType.Cross|| currentPipeType == PipeType.CurvedTopRight || currentPipeType == PipeType.CurvedTopLeft){
                         waterPipe = new WaterPipe(adjacentPipeType);
-                        break;
-                    }            
+                    }     
+                    break;       
                 case "right":
                     if(currentPipeType == PipeType.StartRight || currentPipeType == PipeType.Horizontal || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomRight || currentPipeType == PipeType.CurvedTopRight){
                         waterPipe = new WaterPipe(adjacentPipeType);
-                        break;
                     }            
+                    break;
                 case "left":
                     if(currentPipeType == PipeType.StartLeft || currentPipeType == PipeType.Horizontal || currentPipeType == PipeType.Cross || currentPipeType == PipeType.CurvedBottomLeft || currentPipeType == PipeType.CurvedTopLeft){
                         waterPipe = new WaterPipe(adjacentPipeType);
-                        break;
                     }    
+                    break;
             }
         }
         
@@ -228,8 +232,9 @@ export class Grid {
             this.cells[adjacentCellRow][adjacentCellCol].setPipe(waterPipe);
             const { x, y} = this.getCellPosition(adjacentCellRow,adjacentCellCol,ctx);
             waterPipe.fillPipeWithWater()
-            //this.cells[adjacentCellRow][adjacentCellCol].setBlocked(true);
         }
+        //this.updateAdjacentCellsWithWater(ctx, adjacentCellRow, adjacentCellCol);
+
     }
 
     private getDirection(adjacentCellRow: number, adjacentCellCol: number, row:number, col:number): String{
@@ -249,21 +254,43 @@ export class Grid {
     }
 
     private getPossibleConnectionsToAdjacentPipes(currentCell: Cell) {
+        debugger;
         const possibleConnections: Cell[] = [];
         const row = currentCell.getRow();
         const col = currentCell.getCol();
+        const currentPipeType = currentCell.getPipe()?.getType();
 
-        if(this.isValidCell(row+1,col) && this.containsPipe(row+1,col)){
-            possibleConnections.push(this.cells[row+1][col]);
-        }
-        if(this.isValidCell(row-1,col) && this.containsPipe(row-1,col)){
-            possibleConnections.push(this.cells[row-1][col]);
-        }
-        if(this.isValidCell(row,col+1) && this.containsPipe(row,col+1)){
-            possibleConnections.push(this.cells[row][col+1]);
-        }
-        if(this.isValidCell(row,col-1) && this.containsPipe(row,col-1)){
-            possibleConnections.push(this.cells[row][col-1]);
+        // Verifica a direção com base no tipo do pipe
+        if (currentPipeType === PipeType.Horizontal || currentPipeType === PipeType.StartLeft || currentPipeType === PipeType.StartRight) {
+            // Procura apenas na mesma linha
+            if (this.isValidCell(row, col + 1) && this.containsPipe(row, col + 1)) {
+                possibleConnections.push(this.cells[row][col + 1]);
+            }
+            if (this.isValidCell(row, col - 1) && this.containsPipe(row, col - 1)) {
+                possibleConnections.push(this.cells[row][col - 1]);
+            }
+        } else if (currentPipeType === PipeType.Vertical || currentPipeType === PipeType.StartUp || currentPipeType === PipeType.StartDown) {
+            // Procura apenas na mesma coluna
+            if (this.isValidCell(row + 1, col) && this.containsPipe(row + 1, col)) {
+                possibleConnections.push(this.cells[row + 1][col]);
+            }
+            if (this.isValidCell(row - 1, col) && this.containsPipe(row - 1, col)) {
+                possibleConnections.push(this.cells[row - 1][col]);
+            }
+        } else if (currentPipeType === PipeType.Cross) {
+            // Se for um cruzamento, procura em todas as direções
+            if (this.isValidCell(row + 1, col) && this.containsPipe(row + 1, col)) {
+                possibleConnections.push(this.cells[row + 1][col]);
+            }
+            if (this.isValidCell(row - 1, col) && this.containsPipe(row - 1, col)) {
+                possibleConnections.push(this.cells[row - 1][col]);
+            }
+            if (this.isValidCell(row, col + 1) && this.containsPipe(row, col + 1)) {
+                possibleConnections.push(this.cells[row][col + 1]);
+            }
+            if (this.isValidCell(row, col - 1) && this.containsPipe(row, col - 1)) {
+                possibleConnections.push(this.cells[row][col - 1]);
+            }
         }
 
         return possibleConnections;
