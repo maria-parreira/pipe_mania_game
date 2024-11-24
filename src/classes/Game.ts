@@ -21,7 +21,7 @@ export class Game {
   private selectedPipe: Pipe | null = null;
   private isRunning: boolean = true;
 
-  private countdown: number = 10; // Tempo restante para a água começar
+  private countdown: number = 20; // Tempo restante para a água começar
   private timerInterval: number | null = null; // Referência para o intervalo do temporizador
 
   private score: number = 0; // Pontuação do jogador

@@ -1,4 +1,5 @@
-﻿import { PipeType } from "./PipeType";
+﻿import { Direction } from "./Direction";
+import { PipeType } from "./PipeType";
 
 export interface Pipe {
  draw(ctx: CanvasRenderingContext2D, x: number , y: number , cellSize: number):any;

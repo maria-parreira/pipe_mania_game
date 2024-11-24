@@ -59,6 +59,7 @@ const imagePaths: { [key: string]: string } = {
   curvedBottom: 'src/assets/waterflow/curvedBottom',
   cross100V: 'src/assets/waterflow/cross/100V.jpeg',
   cross66e: 'src/assets/waterflow/cross/66e.jpeg',
+  cross66d: 'src/assets/waterflow/cross/66d.jpeg',
   cross100H: 'src/assets/waterflow/cross/100H.jpeg',
   cross33e: 'src/assets/waterflow/cross/33e.jpeg',
   cross33d: 'src/assets/waterflow/cross/33d.jpeg',

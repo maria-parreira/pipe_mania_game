@@ -1,5 +1,6 @@
 ﻿import { images } from "../configuration/gameConfiguration";
 import { Cell } from "./Cell";
+import { Direction } from "./Direction";
 import { Pipe } from './Pipe';
 import { PipeType } from "./PipeType";
 import { RegularPipe } from "./RegularPipe";
@@ -185,19 +186,22 @@ export class Grid {
         }
     }
 
+
     // refatorar este metodo para devolver coordenadas do pipe 
 
     private async updateAdjacentCellWithWaterPipe(ctx: CanvasRenderingContext2D, row: number, col: number, adjacent: Cell): Promise<void> {
         const adjacentCellRow = adjacent.getRow();
         const adjacentCellCol = adjacent.getCol();
+
     
         const direction = this.getDirection(adjacentCellRow, adjacentCellCol, row, col);
         const currentPipe = this.cells[row][col].getPipe();
         const adjacentPipe = this.cells[adjacentCellRow][adjacentCellCol].getPipe();
     
-        if (this.arePipesCompatible(currentPipe, adjacentPipe, direction)) {
-            const waterPipe = new WaterPipe(adjacentPipe!.getType()); // Garantimos que o adjacente é válido aqui
+        if (this.arePipesCompatible(currentPipe!, adjacentPipe!, direction!)) {
+            const waterPipe = new WaterPipe(adjacentPipe!.getType(), direction!); // Garantimos que o adjacente é válido aqui
             this.cells[adjacentCellRow][adjacentCellCol].setPipe(waterPipe);
+
             await waterPipe.fillPipeWithWater();
     
             // Redesenhe a célula atual e adjacente
@@ -216,9 +220,7 @@ export class Grid {
     }
 
         // Novo método para verificar compatibilidade entre pipes
-    private arePipesCompatible(currentPipe: Pipe | null, adjacentPipe: Pipe | null, direction: string): boolean {
-        if (!currentPipe || !adjacentPipe) return false;
-    
+    private arePipesCompatible(currentPipe: Pipe, adjacentPipe: Pipe, direction: Direction): boolean {    
         const compatibilityMap: Record<PipeType, Record<string, boolean>> = {
             [PipeType.Vertical]: { up: true, down: true },
             [PipeType.Horizontal]: { left: true, right: true },
@@ -239,20 +241,20 @@ export class Grid {
     }
 
 
-    private getDirection(adjacentCellRow: number, adjacentCellCol: number, row: number, col: number): string {
-        if (adjacentCellRow < row) return "up";
-        if (adjacentCellRow > row) return "down";
-        if (adjacentCellCol > col) return "right";
-        if (adjacentCellCol < col) return "left";
-        return "";
+    private getDirection(adjacentCellRow: number, adjacentCellCol: number, row: number, col: number): Direction | null {
+        if (adjacentCellRow < row) return Direction.Up;
+        if (adjacentCellRow > row) return Direction.Down;
+        if (adjacentCellCol > col) return Direction.Right;
+        if (adjacentCellCol < col) return Direction.Left;
+        return null;
     }
         
     private getOppositeDirection(direction: string): string {
         const opposites: Record<string, string> = {
-            up: "down",
-            down: "up",
-            left: "right",
-            right: "left"
+            up: Direction.Down,
+            down: Direction.Up,
+            left: Direction.Right,
+            right: Direction.Left
         };
         return opposites[direction];
     }
