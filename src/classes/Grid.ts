@@ -242,7 +242,10 @@ export class Grid {
                 this.notifyPipeFilled();
             });
 
-                        await this.updateAdjacentCellsWithWater(ctx, adjacentCellRow, adjacentCellCol);
+            await this.updateAdjacentCellsWithWater(ctx, adjacentCellRow, adjacentCellCol);
+        }
+        else{
+            this.notifyGameOver();
         }
     }
 

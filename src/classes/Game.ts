@@ -18,7 +18,8 @@ export class Game {
   static readonly GAME_OVER_TEXT_ALIGN = "center";
   static readonly CONTEXT = "2d";
   static readonly CANVAS_QUERY_SELECTOR = "canvas";
-  
+  static readonly WINNING_SCORE = 100;
+
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   
@@ -31,7 +32,6 @@ export class Game {
   private timerInterval: number | null = null; 
   private score: number = 0; 
 
-
   constructor(
     canvas: HTMLCanvasElement,
     grid: Grid
@@ -39,15 +39,6 @@ export class Game {
     this.canvas = canvas;
     this.ctx = canvas.getContext(Game.CONTEXT)!;
     this.grid = grid;
-    this.grid.setOnPipeFilledCallback(() => {
-      if (this.countdown === 0) {
-          this.score += 10; 
-      }
-    });
-
-    this.grid.setOnGameOverCallback(() => {
-      this.handleGameOver();
-    });
   
     this.preloadImages().then(() => {
       this.addEventListeners();
@@ -57,6 +48,9 @@ export class Game {
 
   public startGame(ctx:CanvasRenderingContext2D) {
     this.startCountdown(ctx);
+    this.grid.setOnGameOverCallback(() => {
+      this.handleGameOver();
+    });
     this.runGameLoop();
   }
 
@@ -93,10 +87,22 @@ export class Game {
   }
 
   private startWaterFlow() {
-        const startPipeCoordinates = this.grid.getInitialPipePosition();
-        const row = startPipeCoordinates?.row!;
-        const col = startPipeCoordinates?.col!;
-        this.grid.updateAdjacentCellsWithWater(this.ctx, row, col);
+    this.grid.setOnPipeFilledCallback(() => {
+      if (this.countdown === 0) {
+          this.increaseScore(10);
+      }
+    });
+    const startPipeCoordinates = this.grid.getInitialPipePosition();
+    const row = startPipeCoordinates?.row!;
+    const col = startPipeCoordinates?.col!;
+    this.grid.updateAdjacentCellsWithWater(this.ctx, row, col);
+  }
+
+  private increaseScore(points: number) {
+    this.score += points;
+    if (this.score >= Game.WINNING_SCORE) {
+      this.notifyWinGame();
+    }
 }
 
   private runGameLoop() {
@@ -127,7 +133,8 @@ export class Game {
       10,
       20
     );
-    this.ctx.fillText(`Score: ${this.score}`, 10, 50);
+    this.ctx.fillText(`Score to win: ${Game.WINNING_SCORE}`, 10, 50);
+    this.ctx.fillText(`Score: ${this.score}`, 10, 70);
   }
 
   private addEventListeners() {
@@ -161,10 +168,11 @@ export class Game {
   }
 
   private handleGameOver() {
-    this.isRunning = false;
-    this.drawGameOverScreen();
-    
-    this.canvas.addEventListener("click", this.restartGame.bind(this), { once: true });
+    if(this.isRunning){
+      this.drawGameOverScreen();
+      this.canvas.addEventListener("click", this.restartGame.bind(this), { once: true });
+      this.isRunning = false;
+    }
   }
 
   private drawGameOverScreen() {
@@ -202,5 +210,32 @@ export class Game {
 
     this.isRunning = true;
     this.startGame(this.ctx);
-}
+  }
+
+  private notifyWinGame() {
+    if (this.onWinGameCallback) {
+        this.onWinGameCallback();
+    }
+  }
+
+  private onWinGameCallback() {
+    this.isRunning = false;
+
+    this.drawWinScreen(this.ctx);
+    this.canvas.addEventListener("click", this.restartGame.bind(this), { once: true });
+  };
+
+  private drawWinScreen(ctx: CanvasRenderingContext2D) {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    // Estilo semelhante ao Game Over
+    ctx.font = Game.GAME_OVER_FONT;
+    ctx.fillStyle = Game.GAME_OVER_FILL_STYLE;
+    ctx.textAlign = Game.GAME_OVER_TEXT_ALIGN;
+    ctx.fillText("Congratulations! You Win!", ctx.canvas.width / 2, ctx.canvas.height / 2 - 20);
+    
+    ctx.font = Game.HUD_FONT;
+    ctx.fillStyle = Game.HUD_FILL_STYLE;
+    ctx.fillText("Click to Restart", ctx.canvas.width / 2, ctx.canvas.height / 2 + 20);
+  }
 }
