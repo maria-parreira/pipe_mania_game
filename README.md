@@ -92,7 +92,7 @@ The game starts with a **countdown timer** that counts down from 20 seconds. Whe
    - Implement dynamic resizing and scaling of the canvas, grid, and game elements to ensure everything is visible and playable on all screen sizes.
 
 ## Blocked cells
-![blockedCell](publicassets/blockedcell.png)
+![blockedCell](public/assets/blockedcell.png)
 
 ## Start Pipe
 ![StartPipe](public/assets/start/startDown.png)
