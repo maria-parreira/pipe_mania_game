@@ -242,9 +242,7 @@ export class Grid {
                 this.notifyPipeFilled();
             });
 
-            this.drawCellAndPipe(ctx, row, col);
-            this.drawCellAndPipe(ctx, adjacentCellRow, adjacentCellCol);
-            await this.updateAdjacentCellsWithWater(ctx, adjacentCellRow, adjacentCellCol);
+                        await this.updateAdjacentCellsWithWater(ctx, adjacentCellRow, adjacentCellCol);
         }
     }
 
