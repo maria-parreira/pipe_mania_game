@@ -1,5 +1,4 @@
 ﻿import { images, startImages, waterImages } from "../configuration/gameConfiguration";
-import { Direction } from "./Direction";
 import { Pipe } from "./Pipe";
 import { PipeType } from "./PipeType";
 
