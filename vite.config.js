@@ -1,20 +1,23 @@
 ﻿import { defineConfig } from "vite";
+import copy from "rollup-plugin-copy";
 
 export default defineConfig({
-  // Configuração para o build
   build: {
-    outDir: "dist", // Define a pasta de saída como 'dist'
-    target: "esnext", // Usa a versão mais recente do ECMAScript para o código gerado
-    modulePreload: true, // Garante o pré-carregamento dos módulos
+    outDir: "dist",
+    target: "esnext",
+    modulePreload: true,
     rollupOptions: {
       input: {
         main: "./index.html",
       },
     },
   },
-
-  // Configuração para resolver arquivos .ts e .js corretamente
+  plugins: [
+    copy({
+      targets: [{ src: "src/assets/*", dest: "dist/assets" }],
+    }),
+  ],
   resolve: {
-    extensions: [".ts", ".js"], // Permite importar arquivos .ts e .js sem a necessidade de extensão
+    extensions: [".ts", ".js"],
   },
 });

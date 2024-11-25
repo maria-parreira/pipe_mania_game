@@ -2,7 +2,6 @@
 import { GameConfiguration, waterImages } from "../configuration/gameConfiguration"; 
 import { PipeQueue } from "./PipeQueue";
 import { Pipe } from "./Pipe";
-import { WaterPipe } from "./WaterPipe";
 
 
 /**
